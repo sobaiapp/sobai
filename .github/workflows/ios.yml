@@ -29,7 +29,13 @@ jobs:
       - name: Configure EAS
         run: |
           if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
-            echo "Error: EXPO_TOKEN secret is not set"
+            echo "::error::EXPO_TOKEN secret is not set. Please follow these steps:"
+            echo "1. Run 'eas login' locally to get your token"
+            echo "2. Go to your GitHub repository settings"
+            echo "3. Navigate to Secrets and variables > Actions"
+            echo "4. Add a new secret named EXPO_TOKEN"
+            echo "5. Paste your token as the value"
+            echo "6. Save the secret"
             exit 1
           fi
           echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" > .env
