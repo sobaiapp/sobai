@@ -1,71 +1,40 @@
-name: iOS Build and Deploy
+name: iOS CI Build
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
+    name: Build iOS app
     runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install Node.js
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install NPM dependencies
-        run: |
-          npm install
-          CI=1 npx expo install
-          
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1.0'
-          bundler-cache: true
-          
-      - name: Install CocoaPods
-        run: |
-          gem install cocoapods
-          pod setup
-          
-      - name: Clean CocoaPods cache
+          node-version: '18'
+
+      - name: Install JavaScript Dependencies
+        run: npm install
+
+      - name: Install CocoaPods Dependencies
         run: |
           cd ios
-          rm -rf Pods
-          rm -f Podfile.lock
-          
-      - name: Install pods
+          pod install
+
+      - name: Build iOS App
         run: |
           cd ios
-          echo "Current directory: $(pwd)"
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          echo "Ruby version: $(ruby -v)"
-          echo "CocoaPods version: $(pod --version)"
-          echo "Contents of node_modules/react-native:"
-          ls -la ../node_modules/react-native
-          pod install --verbose
-        env:
-          CI: true
-          
-      - name: Build iOS app
-        run: |
-          cd ios
-          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath build/SobAi.xcarchive
-          
-      - name: Export IPA
-        run: |
-          cd ios
-          xcodebuild -exportArchive -archivePath build/SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build
-          
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: SobAi.ipa
-          path: ios/build/SobAi.ipa
+          xcodebuild -workspace SobAi.xcworkspace \
+                     -scheme SobAi \
+                     -sdk iphonesimulator \
+                     -destination 'platform=iOS Simulator,name=iPhone 14' \
+                     build
