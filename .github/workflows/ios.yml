@@ -10,11 +10,11 @@ on:
 
 jobs:
   build:
-    name: Build iOS app
+    name: iOS Build
     runs-on: macos-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Node.js
@@ -22,15 +22,24 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install JavaScript Dependencies
-        run: npm install
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: Install CocoaPods Dependencies
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Install CocoaPods
         run: |
           cd ios
           pod install
 
-      - name: Build iOS App
+      - name: Build iOS app
         run: |
           cd ios
           xcodebuild -workspace SobAi.xcworkspace \
