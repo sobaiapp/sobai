@@ -20,8 +20,8 @@ puts "Podfile directory: #{__dir__}"
 puts "Environment PWD: #{ENV['PWD']}"
 
 def resolve_react_native_path
-  # Get the absolute path to the project root
-  project_root = Dir.pwd
+  # Get the absolute path to the project root (one level up from ios directory)
+  project_root = File.expand_path("..", Dir.pwd)
   puts "Project root: #{project_root}"
   
   # Get the direct path to react-native
@@ -71,7 +71,7 @@ puts "NPM version: #{`npm -v`.strip}"
 puts "Current directory contents:"
 puts `ls -la`
 puts "Node modules directory contents:"
-puts `ls -la node_modules` if Dir.exist?('node_modules')
+puts `ls -la ../node_modules` if Dir.exist?('../node_modules')
 
 target 'SobAi' do
   # React Native dependencies
