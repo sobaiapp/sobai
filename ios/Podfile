@@ -22,44 +22,24 @@ puts "Environment PWD: #{ENV['PWD']}"
 project_root = File.expand_path('..', __dir__)
 puts "Project root: #{project_root}"
 
-# Check if node_modules exists
-node_modules_path = File.join(project_root, 'node_modules')
-puts "Checking node_modules directory: #{node_modules_path}"
-if Dir.exist?(node_modules_path)
-  puts "node_modules directory exists"
-  puts "Contents of node_modules:"
-  puts `ls -la #{node_modules_path}`
-else
-  puts "node_modules directory does not exist"
-  puts "Running npm install..."
-  system("cd #{project_root} && npm install")
+# Direct path to React Native
+react_native_path = File.join(project_root, 'node_modules', 'react-native')
+puts "Direct React Native path: #{react_native_path}"
+
+# Verify React Native installation
+package_json_path = File.join(react_native_path, 'package.json')
+puts "Checking package.json at: #{package_json_path}"
+
+unless File.exist?(package_json_path)
+  raise "React Native package.json not found at: #{package_json_path}"
 end
 
-# Try to find React Native using node
-begin
-  react_native_path = `node --print "require.resolve('react-native/package.json')"`
-  react_native_path = File.dirname(react_native_path.strip)
-  puts "Resolved React Native path via Node: #{react_native_path}"
-rescue => e
-  puts "Error resolving React Native via Node: #{e.message}"
-  react_native_path = nil
-end
+# Verify React Native scripts
+react_native_pods_path = File.join(react_native_path, 'scripts', 'react_native_pods.rb')
+puts "Checking react_native_pods.rb at: #{react_native_pods_path}"
 
-# Fallback paths
-fallback_paths = [
-  File.join(project_root, 'node_modules', 'react-native'),
-  File.join(Dir.pwd, 'node_modules', 'react-native'),
-  File.join(ENV['PWD'], 'node_modules', 'react-native')
-]
-
-puts "Checking fallback paths:"
-fallback_paths.each do |path|
-  puts "  - #{path}"
-  if File.exist?(File.join(path, 'package.json'))
-    react_native_path = path
-    puts "Found React Native at: #{path}"
-    break
-  end
+unless File.exist?(react_native_pods_path)
+  raise "React Native pods script not found at: #{react_native_pods_path}"
 end
 
 # Additional debug information
@@ -69,20 +49,6 @@ puts "Current directory contents:"
 puts `ls -la`
 puts "Node modules directory contents:"
 puts `ls -la node_modules` if Dir.exist?('node_modules')
-
-unless react_native_path && File.exist?(File.join(react_native_path, 'package.json'))
-  raise "Could not find React Native. Tried paths:\n" +
-        "- Node resolution: #{react_native_path}\n" +
-        "- Fallback paths:\n" +
-        fallback_paths.map { |p| "  - #{p}" }.join("\n")
-end
-
-# Verify the package.json exists at the resolved path
-package_json_path = File.join(react_native_path, 'package.json')
-puts "Verifying package.json at: #{package_json_path}"
-unless File.exist?(package_json_path)
-  raise "React Native package.json not found at: #{package_json_path}"
-end
 
 target 'SobAi' do
   # React Native dependencies
