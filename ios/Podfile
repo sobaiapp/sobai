@@ -1,5 +1,6 @@
-require 'json'
+require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
+require 'json'
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
 
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
@@ -23,52 +24,33 @@ puts "Environment PWD: #{ENV['PWD']}"
 project_root = File.expand_path('..', __dir__)
 puts "Project root: #{project_root}"
 
-# Try local node_modules path first
-local_react_native_pkg = File.join(project_root, 'node_modules', 'react-native', 'package.json')
+# Try to find React Native using node
+react_native_path = `node --print "require.resolve('react-native/package.json')"`
+react_native_path = File.dirname(react_native_path.strip)
 
-if File.exist?(local_react_native_pkg)
-  react_native_path = File.dirname(local_react_native_pkg)
-  puts "Found React Native locally at: #{react_native_path}"
-else
-  begin
-    react_native_path = `node --print "require.resolve('react-native/package.json')"`
-    react_native_path = File.dirname(react_native_path.strip)
-    puts "Resolved React Native via Node: #{react_native_path}"
-  rescue
-    raise "❌ React Native not found. Please run `npm install` or `yarn install` before `pod install`."
-  end
-end
-
-# Fallbacks if all else fails
+# Fallback paths
 fallback_paths = [
   File.join(project_root, 'node_modules', 'react-native'),
   File.join(Dir.pwd, 'node_modules', 'react-native'),
   File.join(ENV['PWD'], 'node_modules', 'react-native')
 ]
 
-unless File.exist?(File.join(react_native_path, 'package.json'))
-  fallback_found = false
-  fallback_paths.each do |path|
-    if File.exist?(File.join(path, 'package.json'))
-      react_native_path = path
-      fallback_found = true
-      puts "Found React Native fallback at: #{path}"
-      break
-    end
-  end
-
-  unless fallback_found
-    raise <<~ERROR
-      ❌ Could not find React Native. Please make sure you've run `npm install` or `yarn install` before running `pod install`.
-
-      Tried:
-      - #{react_native_path}
-      - #{fallback_paths.join("\n  - ")}
-    ERROR
+fallback_paths.each do |path|
+  if File.exist?(File.join(path, 'package.json'))
+    react_native_path = path
+    break
   end
 end
 
+unless File.exist?(File.join(react_native_path, 'package.json'))
+  raise "Could not find React Native. Tried paths:\n" +
+        "- Node resolution: #{react_native_path}\n" +
+        "- Fallback paths:\n" +
+        fallback_paths.map { |p| "  - #{p}" }.join("\n")
+end
+
 target 'SobAi' do
+  # React Native dependencies
   use_react_native!(
     :path => react_native_path,
     :hermes_enabled => true,
@@ -76,6 +58,7 @@ target 'SobAi' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Post-install configuration
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -83,13 +66,18 @@ target 'SobAi' do
       :mac_catalyst_enabled => false
     )
 
+    # Set build settings for all targets
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
         config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+        
+        # Enable modular headers for better build performance
         config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
         config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-O'
+        
+        # Enable bitcode for App Store submission
         config.build_settings['ENABLE_BITCODE'] = 'NO'
       end
     end
