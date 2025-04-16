@@ -33,6 +33,12 @@ jobs:
         ruby-version: '3.2'
         bundler-cache: true
         
+    - name: Clean CocoaPods cache
+      run: |
+        cd ios
+        rm -rf Pods
+        rm -rf Podfile.lock
+        
     - name: Install and Setup CocoaPods
       run: |
         gem install cocoapods
@@ -58,14 +64,4 @@ jobs:
         app-path: ios/build/SobAi.ipa
         issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
         api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
-        api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
-
-    - name: Clean and Reinstall pods
-      run: |
-        cd ..
-        rm -rf Pods
-        rm -rf Podfile.lock
-        pod install
-
-    - name: Rebuild iOS app
-      run: npx expo run:ios 
+        api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }} 
