@@ -49,6 +49,14 @@ fallback_paths.each do |path|
   end
 end
 
+# Additional debug information
+puts "Node version: #{`node -v`.strip}"
+puts "NPM version: #{`npm -v`.strip}"
+puts "Current directory contents:"
+puts `ls -la`
+puts "Node modules directory contents:"
+puts `ls -la node_modules` if Dir.exist?('node_modules')
+
 unless react_native_path && File.exist?(File.join(react_native_path, 'package.json'))
   raise "Could not find React Native. Tried paths:\n" +
         "- Node resolution: #{react_native_path}\n" +
@@ -66,7 +74,7 @@ end
 target 'SobAi' do
   # React Native dependencies
   use_react_native!(
-    :path => File.expand_path(react_native_path),
+    :path => react_native_path,
     :hermes_enabled => true,
     :fabric_enabled => false,
     :app_path => project_root
@@ -76,7 +84,7 @@ target 'SobAi' do
   post_install do |installer|
     react_native_post_install(
       installer,
-      File.expand_path(react_native_path),
+      react_native_path,
       :mac_catalyst_enabled => false
     )
 
