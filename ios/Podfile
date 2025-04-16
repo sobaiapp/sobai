@@ -22,6 +22,19 @@ puts "Environment PWD: #{ENV['PWD']}"
 project_root = File.expand_path('..', __dir__)
 puts "Project root: #{project_root}"
 
+# Check if node_modules exists
+node_modules_path = File.join(project_root, 'node_modules')
+puts "Checking node_modules directory: #{node_modules_path}"
+if Dir.exist?(node_modules_path)
+  puts "node_modules directory exists"
+  puts "Contents of node_modules:"
+  puts `ls -la #{node_modules_path}`
+else
+  puts "node_modules directory does not exist"
+  puts "Running npm install..."
+  system("cd #{project_root} && npm install")
+end
+
 # Try to find React Native using node
 begin
   react_native_path = `node --print "require.resolve('react-native/package.json')"`
