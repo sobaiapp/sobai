@@ -27,6 +27,14 @@ jobs:
         npm install
         npx expo install
         
+    - name: Verify React Native installation
+      run: |
+        if [ ! -f "node_modules/react-native/package.json" ]; then
+          echo "React Native package.json not found!"
+          exit 1
+        fi
+        echo "React Native installation verified"
+        
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
