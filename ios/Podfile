@@ -16,11 +16,24 @@ prepare_react_native_project!
 
 # Get the absolute path to the project root
 project_root = File.expand_path('..', __dir__)
-react_native_path = File.join(project_root, 'node_modules', 'react-native')
 
-# Verify the path exists
-unless File.exist?(File.join(react_native_path, 'package.json'))
-  raise "Could not find React Native at #{react_native_path}. Please run 'npm install' first."
+# Try multiple methods to find React Native
+react_native_path = nil
+possible_paths = [
+  File.join(project_root, 'node_modules', 'react-native'),
+  File.join(Dir.pwd, 'node_modules', 'react-native'),
+  File.join(ENV['PWD'], 'node_modules', 'react-native')
+]
+
+possible_paths.each do |path|
+  if File.exist?(File.join(path, 'package.json'))
+    react_native_path = path
+    break
+  end
+end
+
+unless react_native_path
+  raise "Could not find React Native. Tried paths: #{possible_paths.join(', ')}"
 end
 
 target 'SobAi' do
