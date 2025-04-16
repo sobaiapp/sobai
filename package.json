@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "postinstall": "npx expo install"
+    "postinstall": "npx expo install --fix"
   },
   "dependencies": {
     "@babel/plugin-transform-async-generator-functions": "^7.26.8",
