@@ -26,7 +26,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1.0'
+          ruby-version: '2.7.8'
           bundler-cache: true
           
       - name: Install CocoaPods
@@ -43,7 +43,14 @@ jobs:
       - name: Install pods
         run: |
           cd ios
-          pod install
+          echo "Current directory: $(pwd)"
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+          echo "Ruby version: $(ruby -v)"
+          echo "CocoaPods version: $(pod --version)"
+          echo "Contents of node_modules/react-native:"
+          ls -la ../node_modules/react-native
+          pod install --verbose
         env:
           CI: true
           
