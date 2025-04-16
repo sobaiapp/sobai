@@ -16,19 +16,21 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode.app
       
-    - name: Install CocoaPods
-      run: |
-        sudo gem install cocoapods
-        cd ios
-        pod install
-        
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         
     - name: Install NPM dependencies
-      run: npm install
+      run: |
+        npm install -g expo-cli
+        npm install
+        
+    - name: Install CocoaPods
+      run: |
+        sudo gem install cocoapods
+        cd ios
+        pod install
         
     - name: Build iOS app
       run: |
