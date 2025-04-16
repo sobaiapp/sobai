@@ -39,8 +39,8 @@ jobs:
             exit 1
           fi
           echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" > .env
-          EAS_TOKEN=${{ secrets.EXPO_TOKEN }} eas login
-          eas whoami
+          export EAS_TOKEN=${{ secrets.EXPO_TOKEN }}
+          eas build:configure
           
       - name: Build iOS app
         run: eas build --platform ios --non-interactive
