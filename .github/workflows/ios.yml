@@ -28,7 +28,12 @@ jobs:
         
       - name: Configure EAS
         run: |
-          echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" >> .env
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "Error: EXPO_TOKEN secret is not set"
+            exit 1
+          fi
+          echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" > .env
+          eas login --token ${{ secrets.EXPO_TOKEN }}
           eas whoami
           
       - name: Build iOS app
