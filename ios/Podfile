@@ -43,6 +43,8 @@ target 'SobAi' do
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false'
   )
 
+  pod 'React-RuntimeHermes', :path => '../node_modules/react-native/ReactCommon/react/runtime', :modular_headers => true
+
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -65,6 +67,10 @@ target 'SobAi' do
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
         config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+        
+        if target.name == 'React-RuntimeHermes'
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+        end
       end
     end
   end
