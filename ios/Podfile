@@ -13,8 +13,6 @@ install! 'cocoapods',
   :generate_multiple_pod_projects => true,
   :incremental_installation => true
 
-prepare_react_native_project!
-
 # Debug logs for CI
 puts "Current directory: #{Dir.pwd}"
 puts "Podfile directory: #{__dir__}"
@@ -25,8 +23,14 @@ project_root = File.expand_path('..', __dir__)
 puts "Project root: #{project_root}"
 
 # Try to find React Native using node
-react_native_path = `node --print "require.resolve('react-native/package.json')"`
-react_native_path = File.dirname(react_native_path.strip)
+begin
+  react_native_path = `node --print "require.resolve('react-native/package.json')"`
+  react_native_path = File.dirname(react_native_path.strip)
+  puts "Resolved React Native path via Node: #{react_native_path}"
+rescue => e
+  puts "Error resolving React Native via Node: #{e.message}"
+  react_native_path = nil
+end
 
 # Fallback paths
 fallback_paths = [
@@ -35,14 +39,17 @@ fallback_paths = [
   File.join(ENV['PWD'], 'node_modules', 'react-native')
 ]
 
+puts "Checking fallback paths:"
 fallback_paths.each do |path|
+  puts "  - #{path}"
   if File.exist?(File.join(path, 'package.json'))
     react_native_path = path
+    puts "Found React Native at: #{path}"
     break
   end
 end
 
-unless File.exist?(File.join(react_native_path, 'package.json'))
+unless react_native_path && File.exist?(File.join(react_native_path, 'package.json'))
   raise "Could not find React Native. Tried paths:\n" +
         "- Node resolution: #{react_native_path}\n" +
         "- Fallback paths:\n" +
