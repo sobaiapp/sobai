@@ -20,29 +20,39 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
         
     - name: Install NPM dependencies
       run: |
-        npm install -g expo-cli
         npm install
+        npx expo install
         
-    - name: Install CocoaPods
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+        
+    - name: Install and Setup CocoaPods
       run: |
-        sudo gem install cocoapods
+        gem install cocoapods
         cd ios
-        pod install
+        pod install --repo-update
         
     - name: Build iOS app
+      env:
+        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
       run: |
         cd ios
-        xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' archive -archivePath $PWD/build/SobAi.xcarchive
+        xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' archive -archivePath $PWD/build/SobAi.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
         
     - name: Export IPA
       run: |
         cd ios
-        xcodebuild -exportArchive -archivePath $PWD/build/SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
+        xcodebuild -exportArchive -archivePath $PWD/build/SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $PWD/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
         
     - name: Upload to App Store Connect
+      if: github.ref == 'refs/heads/main'
       uses: apple-actions/upload-testflight-build@v1
       with:
         app-path: ios/build/SobAi.ipa
