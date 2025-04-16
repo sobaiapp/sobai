@@ -39,7 +39,8 @@ import {
   PROFILES_COLLECTION_ID,
   STATS_COLLECTION_ID,
   ACHIEVEMENTS_COLLECTION_ID,
-  POSTS_COLLECTION_ID
+  POSTS_COLLECTION_ID,
+  verifySession
 } from '../services/appwrite';
 import { useAuth } from '../context/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -66,6 +67,32 @@ const ProfileScreen = ({ navigation, route }) => {
   const [newPost, setNewPost] = useState('');
   const [isPosting, setIsPosting] = useState(false);
 
+  // Check session on mount and when user changes
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const isSessionValid = await verifySession();
+        if (!isSessionValid) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Start' }]
+          });
+          return;
+        }
+        if (user) {
+          loadProfileData();
+        }
+      } catch (error) {
+        console.error('Session verification error:', error);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Start' }]
+        });
+      }
+    };
+    checkSession();
+  }, [user]);
+
   // Handle profile updates from EditProfile screen
   useEffect(() => {
     if (route.params?.updatedProfile) {
@@ -73,19 +100,10 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   }, [route.params]);
 
-  // Load user data when component mounts or when user changes
-  useEffect(() => {
-    if (user) {
-      loadProfileData();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
-
   const loadProfileData = async () => {
     if (!user) {
       setLoading(false);
-        return;
+      return;
     }
 
     try {
@@ -582,40 +600,6 @@ const ProfileScreen = ({ navigation, route }) => {
         )}
       </TouchableOpacity>
     );
-  };
-
-  const checkUserSession = async () => {
-    try {
-      setLoading(true);
-      const isSessionValid = await verifySession();
-      
-      if (!isSessionValid) {
-        Alert.alert(
-          'Session Expired',
-          'Please sign in again to continue.',
-          [{ text: 'OK', onPress: () => navigation.reset({
-            index: 0,
-            routes: [{ name: 'Start' }]
-          })}]
-        );
-        return;
-      }
-
-      // If session is valid, load user data
-      await loadProfileData();
-    } catch (error) {
-      console.error('Session check error:', error);
-      Alert.alert(
-        'Error',
-        'There was a problem checking your session. Please try again.',
-        [{ text: 'OK', onPress: () => navigation.reset({
-          index: 0,
-          routes: [{ name: 'Start' }]
-        })}]
-      );
-    } finally {
-      setLoading(false);
-    }
   };
 
   const calculateDaysClean = (cleanDate) => {
