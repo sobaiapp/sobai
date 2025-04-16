@@ -18,13 +18,35 @@ puts "Current directory: #{Dir.pwd}"
 puts "Podfile directory: #{__dir__}"
 puts "Environment PWD: #{ENV['PWD']}"
 
-# Get the absolute path to the project root
-project_root = File.expand_path('..', __dir__)
-puts "Project root: #{project_root}"
+def resolve_react_native_path
+  # Get the absolute path to the project root
+  project_root = `pwd`.strip
+  puts "Project root: #{project_root}"
+  
+  # Get the direct path to react-native
+  react_native_path = File.join(project_root, 'node_modules', 'react-native')
+  puts "Direct React Native path: #{react_native_path}"
+  
+  # Check if package.json exists at the path
+  package_json_path = File.join(react_native_path, 'package.json')
+  puts "Checking package.json at: #{package_json_path}"
+  
+  # Check if react_native_pods.rb exists
+  pods_rb_path = File.join(react_native_path, 'scripts', 'react_native_pods.rb')
+  puts "Checking react_native_pods.rb at: #{pods_rb_path}"
+  
+  # Return the path if both files exist
+  if File.exist?(package_json_path) && File.exist?(pods_rb_path)
+    react_native_path
+  else
+    # Fallback to the default path
+    File.join(project_root, 'node_modules', 'react-native')
+  end
+end
 
-# Direct path to React Native
-react_native_path = File.join(project_root, 'node_modules', 'react-native')
-puts "Direct React Native path: #{react_native_path}"
+# Get the path to react-native
+react_native_path = resolve_react_native_path
+puts "Using React Native path: #{react_native_path}"
 
 # Verify React Native installation
 package_json_path = File.join(react_native_path, 'package.json')
@@ -56,7 +78,7 @@ target 'SobAi' do
     :path => react_native_path,
     :hermes_enabled => true,
     :fabric_enabled => false,
-    :app_path => project_root
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   # Post-install configuration
