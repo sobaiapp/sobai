@@ -26,7 +26,7 @@ const AiScreen = () => {
   const [messages, setMessages] = useState([
     { 
       id: '1', 
-      text: "Hello! I'm SōBi, your AI sober companion. How can I support you today?", 
+      text: "Hello! I'm SōBi, your AI sober companion. I'm here to support you on your journey to recovery. How can I help you today? 💪", 
       sender: 'bot',
       timestamp: new Date().toISOString()
     },
