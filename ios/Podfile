@@ -13,7 +13,9 @@ install! 'cocoapods',
 prepare_react_native_project!
 
 target 'SobAi' do
-  config = use_native_modules!
+  config = use_native_modules! do |config|
+    config[:reactNativePath] = File.join(__dir__, '..', 'node_modules', 'react-native')
+  end
 
   use_react_native!(
     :path => config[:reactNativePath],
