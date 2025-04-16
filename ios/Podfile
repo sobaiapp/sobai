@@ -13,7 +13,10 @@ install! 'cocoapods',
 prepare_react_native_project!
 
 target 'SobAi' do
-  config = use_native_modules!
+  config = use_native_modules! do
+    config_command = ['node', '-e', "process.argv=['', '', 'config'];require('./node_modules/@react-native-community/cli').run()"]
+    use_native_modules!(config_command)
+  end
 
   use_react_native!(
     :path => config[:reactNativePath],
