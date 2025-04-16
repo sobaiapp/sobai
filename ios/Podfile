@@ -14,9 +14,14 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
-# Get the React Native path using node
-react_native_path = `node --print "require.resolve('react-native/package.json')"`
-react_native_path = File.dirname(react_native_path.strip)
+# Get the absolute path to the project root
+project_root = File.expand_path('..', __dir__)
+react_native_path = File.join(project_root, 'node_modules', 'react-native')
+
+# Verify the path exists
+unless File.exist?(File.join(react_native_path, 'package.json'))
+  raise "Could not find React Native at #{react_native_path}. Please run 'npm install' first."
+end
 
 target 'SobAi' do
   # React Native dependencies
