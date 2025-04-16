@@ -18,56 +18,26 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
-      - name: Clean NPM cache and install dependencies
+      - name: Install NPM dependencies
         run: |
-          npm cache clean --force
-          rm -f package-lock.json
           npm install
-          CI=1 npx expo install
+          npx expo install --fix
           
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1.0'
-          bundler-cache: true
-          
-      - name: Install CocoaPods
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+        
+      - name: Configure EAS
         run: |
-          gem install cocoapods
-          pod setup
-          
-      - name: Clean CocoaPods cache
-        run: |
-          cd ios
-          rm -rf Pods
-          rm -f Podfile.lock
-          
-      - name: Install pods
-        run: |
-          cd ios
-          echo "Current directory: $(pwd)"
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          echo "Ruby version: $(ruby -v)"
-          echo "CocoaPods version: $(pod --version)"
-          echo "Contents of node_modules/react-native:"
-          ls -la ../node_modules/react-native
-          pod install --verbose
-        env:
-          CI: true
+          echo "EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}" >> .env
+          eas whoami
           
       - name: Build iOS app
-        run: |
-          cd ios
-          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath build/SobAi.xcarchive
-          
-      - name: Export IPA
-        run: |
-          cd ios
-          xcodebuild -exportArchive -archivePath build/SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build
+        run: eas build --platform ios --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: SobAi.ipa
-          path: ios/build/SobAi.ipa
+          path: build/ios/*.ipa
