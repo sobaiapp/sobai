@@ -53,7 +53,7 @@ jobs:
           xcodebuild -exportArchive -archivePath ios/build/SobAi.xcarchive -exportOptionsPlist ios/exportOptions.plist -exportPath ios/build
           
       - name: Upload IPA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SobAi.ipa
           path: ios/build/SobAi.ipa
