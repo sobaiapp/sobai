@@ -36,21 +36,26 @@ jobs:
           
       - name: Clean CocoaPods cache
         run: |
+          cd ios
           rm -rf Pods
           rm -f Podfile.lock
           
       - name: Install pods
-        run: pod install
+        run: |
+          cd ios
+          pod install
         env:
           CI: true
           
       - name: Build iOS app
         run: |
-          xcodebuild -workspace ios/SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath ios/build/SobAi.xcarchive
+          cd ios
+          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath build/SobAi.xcarchive
           
       - name: Export IPA
         run: |
-          xcodebuild -exportArchive -archivePath ios/build/SobAi.xcarchive -exportOptionsPlist ios/exportOptions.plist -exportPath ios/build
+          cd ios
+          xcodebuild -exportArchive -archivePath build/SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build
           
       - name: Upload IPA
         uses: actions/upload-artifact@v4
