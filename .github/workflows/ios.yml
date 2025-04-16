@@ -18,8 +18,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
-      - name: Install NPM dependencies
+      - name: Clean NPM cache and install dependencies
         run: |
+          npm cache clean --force
+          rm -f package-lock.json
           npm install
           CI=1 npx expo install
           
