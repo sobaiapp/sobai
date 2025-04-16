@@ -36,6 +36,14 @@ def resolve_react_native_path
   pods_rb_path = File.join(react_native_path, 'scripts', 'react_native_pods.rb')
   puts "Checking react_native_pods.rb at: #{pods_rb_path}"
   
+  # List contents of node_modules directory
+  puts "Contents of node_modules directory:"
+  puts `ls -la #{File.join(project_root, 'node_modules')}`
+  
+  # List contents of react-native directory
+  puts "Contents of react-native directory:"
+  puts `ls -la #{react_native_path}`
+  
   # Return the path if both files exist
   if File.exist?(package_json_path) && File.exist?(pods_rb_path)
     react_native_path
@@ -72,6 +80,9 @@ puts "Current directory contents:"
 puts `ls -la`
 puts "Node modules directory contents:"
 puts `ls -la ../node_modules` if Dir.exist?('../node_modules')
+
+# Load React Native pods
+require File.join(react_native_path, 'scripts', 'react_native_pods')
 
 target 'SobAi' do
   # React Native dependencies
