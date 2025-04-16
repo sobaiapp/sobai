@@ -7,73 +7,53 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: macos-latest
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
-
+      - uses: actions/checkout@v3
+      
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-
+          
       - name: Install NPM dependencies
         run: |
-          npm install
-          npx expo install --non-interactive
-
-      - name: Verify React Native installation
-        run: |
-          if [ ! -f "node_modules/react-native/package.json" ]; then
-            echo "❌ React Native package.json not found!"
-            exit 1
-          fi
-          echo "✅ React Native installation verified"
-
+          npm ci
+          CI=1 npx expo install
+          
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '2.7'
           bundler-cache: true
-
-      - name: Install and Setup CocoaPods
+          
+      - name: Install CocoaPods
         run: |
           gem install cocoapods
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update
-
-      - name: Build iOS app
-        env:
-          DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+          pod setup
+          
+      - name: Clean CocoaPods cache
         run: |
-          cd ios
-          xcodebuild -workspace SobAi.xcworkspace \
-                     -scheme SobAi \
-                     -configuration Release \
-                     -destination 'generic/platform=iOS' \
-                     archive -archivePath $PWD/build/SobAi.xcarchive \
-                     CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
-
+          rm -rf Pods
+          rm -f Podfile.lock
+          
+      - name: Install pods
+        run: pod install
+        env:
+          CI: true
+          
+      - name: Build iOS app
+        run: |
+          xcodebuild -workspace ios/SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath ios/build/SobAi.xcarchive
+          
       - name: Export IPA
         run: |
-          cd ios
-          xcodebuild -exportArchive \
-                     -archivePath $PWD/build/SobAi.xcarchive \
-                     -exportOptionsPlist exportOptions.plist \
-                     -exportPath $PWD/build \
-                     CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
-
-      - name: Upload to App Store Connect
-        if: github.ref == 'refs/heads/main'
-        uses: apple-actions/upload-testflight-build@v1
+          xcodebuild -exportArchive -archivePath ios/build/SobAi.xcarchive -exportOptionsPlist ios/exportOptions.plist -exportPath ios/build
+          
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
         with:
-          app-path: ios/build/SobAi.ipa
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+          name: SobAi.ipa
+          path: ios/build/SobAi.ipa
