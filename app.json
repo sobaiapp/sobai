@@ -1,0 +1,86 @@
+{
+  "expo": {
+    "name": "SobAi",
+    "slug": "sobai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "sobaiapp",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sobai.app",
+      "buildNumber": "1",
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "We need access to your health data to track your fitness progress and provide personalized insights.",
+        "NSHealthUpdateUsageDescription": "We need permission to update your health data to keep your fitness records up to date.",
+        "NSLocationWhenInUseUsageDescription": "We need your location to find NA and AA meetings near you.",
+        "NSLocationAlwaysUsageDescription": "We need your location to find NA and AA meetings near you.",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["sobaiapp"]
+          }
+        ],
+        "NSAppleSignIn": {
+          "enabled": true
+        },
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "We need access to your camera to allow you to take profile pictures.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to allow you to select profile pictures.",
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+      },
+      "entitlements": {
+        "com.apple.developer.applesignin": ["Default"],
+        "com.apple.developer.in-app-payments": ["*"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sobai.app",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3fcbfd7c-ba9a-4941-b4b5-bfad41e53a42"
+      },
+      "appwriteEndpoint": "https://cloud.appwrite.io/v1",
+      "appwriteProjectId": "679926010035434b938c"
+    },
+    "plugins": [
+      "expo-health-connect",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow SobAi to use your location to find NA and AA meetings near you."
+        }
+      ]
+    ],
+    "owner": "mrposada",
+    "privacy": "public",
+    "description": "SobAi is your personal sober companion, helping you stay on track with your recovery journey through daily motivation, community support, and personalized insights.",
+    "githubUrl": "https://github.com/yourusername/sobai"
+  }
+}
