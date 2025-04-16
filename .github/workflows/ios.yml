@@ -18,8 +18,8 @@ jobs:
       
     - name: Install CocoaPods
       run: |
-        gem install bundler
-        bundle install
+        sudo gem install cocoapods
+        cd ios
         pod install
         
     - name: Install Node.js

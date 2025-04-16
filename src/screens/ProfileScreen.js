@@ -85,7 +85,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const loadProfileData = async () => {
     if (!user) {
       setLoading(false);
-      return;
+        return;
     }
 
     try {
