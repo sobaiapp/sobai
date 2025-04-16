@@ -13,10 +13,12 @@ install! 'cocoapods',
 prepare_react_native_project!
 
 target 'SobAi' do
+  # React Native CLI configuration
   config = use_native_modules! do |config|
     config[:reactNativePath] = File.join(__dir__, '..', 'node_modules', 'react-native')
   end
 
+  # React Native dependencies
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => true,
@@ -24,6 +26,7 @@ target 'SobAi' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Post-install configuration
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -31,6 +34,7 @@ target 'SobAi' do
       :mac_catalyst_enabled => false
     )
 
+    # Set build settings for all targets
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
