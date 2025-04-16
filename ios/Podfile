@@ -56,20 +56,27 @@ unless react_native_path && File.exist?(File.join(react_native_path, 'package.js
         fallback_paths.map { |p| "  - #{p}" }.join("\n")
 end
 
+# Verify the package.json exists at the resolved path
+package_json_path = File.join(react_native_path, 'package.json')
+puts "Verifying package.json at: #{package_json_path}"
+unless File.exist?(package_json_path)
+  raise "React Native package.json not found at: #{package_json_path}"
+end
+
 target 'SobAi' do
   # React Native dependencies
   use_react_native!(
-    :path => react_native_path,
+    :path => File.expand_path(react_native_path),
     :hermes_enabled => true,
     :fabric_enabled => false,
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    :app_path => project_root
   )
 
   # Post-install configuration
   post_install do |installer|
     react_native_post_install(
       installer,
-      react_native_path,
+      File.expand_path(react_native_path),
       :mac_catalyst_enabled => false
     )
 
