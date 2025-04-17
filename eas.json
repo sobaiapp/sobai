@@ -9,26 +9,21 @@
       "distribution": "internal",
       "ios": {
         "simulator": true,
-        "cocoapods": "bundler", 
-        "node": "16.13.0"       
+        "cocoapods": "1.11.3"
       }
     },
     "preview": {
       "distribution": "internal",
       "ios": {
         "resourceClass": "m-medium",
-        "deploymentTarget": "13.0",  
-        "cocoapods": "bundler",
-        "node": "16.13.0"
+        "cocoapods": "1.11.3"
       }
     },
     "production": {
       "ios": {
         "resourceClass": "m-medium",
-        "deploymentTarget": "13.0",
-        "cocoapods": "bundler",
-        "node": "16.13.0",
-        "image": "latest"       
+        "cocoapods": "1.11.3",
+        "image": "latest"
       }
     }
   },
