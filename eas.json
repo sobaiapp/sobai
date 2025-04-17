@@ -30,8 +30,9 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "frankposada4@icloud.com", 
-        "ascAppId": "com.sobai.app"            
+        "appleId": "frankposada4@icloud.com",
+        "ascAppId": "com.sobai.app",
+        "appleTeamId": "Q834NS68MG"
       }
     }
   }
