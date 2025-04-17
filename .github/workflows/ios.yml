@@ -32,12 +32,14 @@ jobs:
         run: |
           echo "Configuring EAS..."
           echo "EXPO_TOKEN length: ${#EXPO_TOKEN}"
-          eas build:configure
+          echo "EXPO_TOKEN first 5 chars: ${EXPO_TOKEN:0:5}..."
+          echo "EXPO_TOKEN last 5 chars: ...${EXPO_TOKEN: -5}"
+          EAS_TOKEN=${{ secrets.EXPO_TOKEN }} eas build:configure
           
       - name: Build iOS app
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform ios --non-interactive
+        run: EAS_TOKEN=${{ secrets.EXPO_TOKEN }} eas build --platform ios --non-interactive
         
       - name: Upload IPA
         uses: actions/upload-artifact@v4
