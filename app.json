@@ -28,7 +28,9 @@
         "NSLocationAlwaysUsageDescription": "We need your location to find NA and AA meetings near you.",
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["sobaiapp"]
+            "CFBundleURLSchemes": [
+              "sobaiapp"
+            ]
           }
         ],
         "NSAppleSignIn": {
@@ -40,8 +42,12 @@
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       },
       "entitlements": {
-        "com.apple.developer.applesignin": ["Default"],
-        "com.apple.developer.in-app-payments": ["*"]
+        "com.apple.developer.applesignin": [
+          "Default"
+        ],
+        "com.apple.developer.in-app-payments": [
+          "*"
+        ]
       }
     },
     "android": {
@@ -76,11 +82,18 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow SobAi to use your location to find NA and AA meetings near you."
         }
-      ]
+      ],
+      "expo-router"
     ],
     "owner": "mrposada",
     "privacy": "public",
     "description": "SobAi is your personal sober companion, helping you stay on track with your recovery journey through daily motivation, community support, and personalized insights.",
-    "githubUrl": "https://github.com/yourusername/sobai"
+    "githubUrl": "https://github.com/yourusername/sobai",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3fcbfd7c-ba9a-4941-b4b5-bfad41e53a42"
+    }
   }
 }
