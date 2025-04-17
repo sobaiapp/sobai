@@ -27,17 +27,18 @@ jobs:
         run: npm install -g eas-cli
         
       - name: Configure EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           echo "Configuring EAS..."
           echo "EXPO_TOKEN length: ${#EXPO_TOKEN}"
-          export EAS_TOKEN=${{ secrets.EXPO_TOKEN }}
           eas build:configure
           
       - name: Build iOS app
-        run: eas build --platform ios --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          
+        run: eas build --platform ios --non-interactive
+        
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
