@@ -32,7 +32,10 @@
       "ios": {
         "appleId": "frankposada4@icloud.com",
         "ascAppId": "com.sobai.app",
-        "appleTeamId": "Q834NS68MG"
+        "appleTeamId": "Q834NS68MG",
+        "sku": "com.sobai.app.1",
+        "language": "en-US",
+        "companyName": "SobAi"
       }
     }
   }
