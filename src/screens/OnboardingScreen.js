@@ -6,55 +6,55 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 // Map of icons for each answer option
 const answerIcons = {
   // Question 1
-  'Alcohol': 'wine',
-  'Drugs': 'medical',
-  'Pornography': 'eye-off',
-  'Cigarettes': 'smoke',
+  'Alcohol': 'wine-outline',
+  'Drugs': 'medical-outline',
+  'Pornography': 'eye-off-outline',
+  'Cigarettes': 'flame-outline',
   
   // Question 2
-  'Less than 6 months': 'calendar-sharp',
-  '6 months - 1 year': 'calendar',
-  '1 - 3 years': 'time',
-  '3+ years': 'hourglass',
+  'Less than 6 months': 'calendar-outline',
+  '6 months - 1 year': 'calendar-outline',
+  '1 - 3 years': 'time-outline',
+  '3+ years': 'hourglass-outline',
   
   // Question 3
-  'Better health': 'heart',
-  'Save money': 'cash',
-  'Improve relationships': 'people',
-  'More self-control': 'barbell',
+  'Better health': 'heart-outline',
+  'Save money': 'cash-outline',
+  'Improve relationships': 'people-outline',
+  'More self-control': 'barbell-outline',
   
   // Question 4
-  'Yes': 'checkmark-circle',
-  'No': 'close-circle',
+  'Yes': 'thumbs-up-outline',
+  'No': 'thumbs-down-outline',
   
   // Question 5
-  'Stress': 'flash',
-  'Boredom': 'happy',
-  'Social situations': 'people',
-  'Loneliness': 'person',
+  'Stress': 'flash-outline',
+  'Boredom': 'happy-outline',
+  'Social situations': 'people-outline',
+  'Loneliness': 'person-outline',
   
   // Question 6
-  'Yes': 'notifications',
-  'No': 'notifications-off',
+  'Yes': 'thumbs-up-outline',
+  'No': 'thumbs-down-outline',
   
   // Question 7
-  'Yes': 'chatbubbles',
-  'No': 'chatbox',
+  'Yes': 'thumbs-up-outline',
+  'No': 'thumbs-down-outline',
   
   // Question 8
-  'Days clean counter': 'calendar-number',
-  'Weekly check-ins': 'calendar-week',
-  'Personalized milestones': 'trophy',
+  'Days clean counter': 'calendar-number-outline',
+  'Weekly check-ins': 'calendar-outline',
+  'Personalized milestones': 'trophy-outline',
   
   // Question 9
-  '30 days': 'flag',
-  '60 days': 'flag',
-  '90 days': 'flag',
-  'Custom': 'create',
+  '30 days': 'flag-outline',
+  '60 days': 'flag-outline',
+  '90 days': 'flag-outline',
+  'Custom': 'create-outline',
   
   // Question 10
-  'Yes': 'people-circle',
-  'No': 'person-circle',
+  'Yes': 'thumbs-up-outline',
+  'No': 'thumbs-down-outline',
 };
 
 const questions = [
@@ -129,18 +129,29 @@ const OnboardingScreen = ({ navigation }) => {
   const currentQuestion = questions[currentQuestionIndex];
 
   const loadingMessages = [
-    'Calculating Sobriety...',
-    'Getting Score...',
-    'Finalizing...',
+    'Calculating Sobriety Metrics...',
+    'Applying Recovery Algorithm...',
+    'Generating Wellness Plan...'
   ];
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setLoadingTextIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
-    }, 3000);
-
-    return () => clearInterval(intervalId);
-  }, []);
+    let intervalId;
+    if (isLoading) {
+      // Initial haptic feedback when loading starts
+      Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Heavy);
+      
+      intervalId = setInterval(async () => {
+        // Medium haptic feedback for each message transition
+        await Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Medium);
+        setLoadingTextIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
+      }, 2500); // Increased time to read longer messages
+    }
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isLoading]);
 
   useEffect(() => {
     if (isLoading) {
@@ -203,7 +214,7 @@ const OnboardingScreen = ({ navigation }) => {
       setTimeout(() => {
         setIsLoading(false);
         navigation.navigate('Success');
-      }, 2000);
+      }, 7500); // 3 messages × 2.5 seconds each
     }
   };
 
@@ -265,21 +276,30 @@ const OnboardingScreen = ({ navigation }) => {
 
     return (
       <View style={styles.loadingContainer}>
-        <Animated.View 
-          style={[
-            styles.spinnerContainer,
-            { 
-              transform: [
-                { rotate: spin },
-                { scale: scaleAnim }
-              ] 
-            }
-          ]}
-        >
-          <Ionicons name="infinite" size={60} color="#000" />
-        </Animated.View>
+        <View style={styles.spinnerWrapper}>
+          <Animated.View 
+            style={[
+              styles.spinnerContainer,
+              { 
+                transform: [
+                  { rotate: spin }
+                ] 
+              }
+            ]}
+          >
+            <View style={styles.spinnerRing}>
+              <View style={styles.spinnerHighlight} />
+            </View>
+          </Animated.View>
+        </View>
         
-        <Text style={styles.loadingText}>{loadingMessages[loadingTextIndex]}</Text>
+        <Animated.Text style={[styles.loadingText, { 
+          opacity: 1,
+          fontSize: 22,
+          maxWidth: '85%'
+        }]}>
+          {loadingMessages[loadingTextIndex]}
+        </Animated.Text>
         
         <View style={styles.dotsContainer}>
           {loadingMessages.map((_, index) => (
@@ -436,13 +456,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F9F9F9',
   },
-  spinnerContainer: {
+  spinnerWrapper: {
+    width: 80,
+    height: 80,
     marginBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spinnerContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spinnerRing: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spinnerHighlight: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#000',
+    borderBottomColor: 'transparent',
+    borderLeftColor: 'transparent',
   },
   loadingText: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '600',
-    color: '#333',
+    color: '#000',
     marginTop: 20,
     marginBottom: 30,
     textAlign: 'center',

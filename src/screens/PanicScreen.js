@@ -12,13 +12,16 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
-  Dimensions
+  Dimensions,
+  TextInput,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -38,15 +41,14 @@ const PanicScreen = () => {
   const [showGrounding, setShowGrounding] = useState(false);
   const [showCoping, setShowCoping] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  const [emergencyContacts, setEmergencyContacts] = useState([
+    { id: '1', name: '', number: '' },
+    { id: '2', name: '', number: '' },
+    { id: '3', name: '', number: '' },
+  ]);
+  const [isEditing, setIsEditing] = useState(false);
   
   const pulseAnim = useRef(new Animated.Value(0)).current;
-
-  // Emergency contacts (could be loaded from storage)
-  const emergencyContacts = [
-    { name: 'Sponsor', number: '555-123-4567' },
-    { name: 'Therapist', number: '555-987-6543' },
-    { name: 'Support Friend', number: '555-456-7890' }
-  ];
 
   const breathingSteps = [
     { text: "Breathe in...", duration: 4000 },
@@ -100,6 +102,8 @@ const PanicScreen = () => {
 
       return () => clearInterval(interval);
     }
+
+    loadSavedContacts();
   }, [showBreathing, isBreathing, currentStep]);
 
   const startBreathingAnimation = () => {
@@ -136,9 +140,78 @@ const PanicScreen = () => {
     breathSequence();
   };
 
-  const handleEmergencyCall = (number = '911') => {
-    Vibration.vibrate(100); // Tactile feedback
-    Linking.openURL(`tel:${number}`);
+  const loadSavedContacts = async () => {
+    try {
+      const savedContacts = await AsyncStorage.getItem('emergencyContacts');
+      if (savedContacts) {
+        setEmergencyContacts(JSON.parse(savedContacts));
+      }
+    } catch (error) {
+      console.error('Error loading contacts:', error);
+    }
+  };
+
+  const saveContacts = async () => {
+    try {
+      await AsyncStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+      setIsEditing(false);
+      Alert.alert('Success', 'Emergency contacts saved successfully');
+    } catch (error) {
+      console.error('Error saving contacts:', error);
+      Alert.alert('Error', 'Failed to save contacts');
+    }
+  };
+
+  const handleContactChange = (id, field, value) => {
+    setEmergencyContacts(prevContacts =>
+      prevContacts.map(contact =>
+        contact.id === id ? { ...contact, [field]: value } : contact
+      )
+    );
+  };
+
+  const makeCall = async (number) => {
+    if (!number) {
+      Alert.alert('Error', 'Please enter a valid phone number');
+      return;
+    }
+
+    try {
+      const phoneNumber = `tel:${number}`;
+      const supported = await Linking.canOpenURL(phoneNumber);
+
+      if (supported) {
+        await Linking.openURL(phoneNumber);
+      } else {
+        Alert.alert('Error', 'Phone calls are not supported on this device');
+      }
+    } catch (error) {
+      console.error('Error making call:', error);
+      Alert.alert('Error', 'Failed to make the call');
+    }
+  };
+
+  const handlePanicButtonPress = async () => {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    
+    // Call all saved emergency contacts
+    for (const contact of emergencyContacts) {
+      if (contact.number) {
+        makeCall(contact.number);
+      }
+    }
+
+    // Show alert
+    Alert.alert(
+      'Emergency Alert',
+      'Emergency contacts have been notified. Help is on the way.',
+      [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('Home'),
+        },
+      ]
+    );
   };
 
   const toggleTips = () => {
@@ -226,8 +299,17 @@ const PanicScreen = () => {
         >
           <Icon name="arrow-left" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Urge Support</Text>
-        <View style={styles.headerRightPlaceholder} />
+        <Text style={styles.headerTitle}>Emergency Contacts</Text>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => setIsEditing(!isEditing)}
+        >
+          <Ionicons
+            name={isEditing ? 'checkmark' : 'pencil'}
+            size={24}
+            color="#000"
+          />
+        </TouchableOpacity>
       </View>
 
       <ScrollView 
@@ -235,72 +317,47 @@ const PanicScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View style={{ opacity: fadeAnim, width: '100%' }}>
-          <Text style={styles.message}>
-            You're experiencing an urge, but you've got this! Let's work through it together.
-          </Text>
-
-          <View style={styles.buttonRow}>
-            <TouchableOpacity 
-              style={[styles.smallButton, showTips && styles.activeButton]} 
-              onPress={toggleTips}
-              activeOpacity={0.7}
-            >
-              <Icon name="lightbulb-on" size={20} color="#fff" />
-              <Text style={styles.smallButtonText}>Tips</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.smallButton, showDistractions && styles.activeButton]} 
-              onPress={toggleDistractions}
-              activeOpacity={0.7}
-            >
-              <Icon name="run" size={20} color="#fff" />
-              <Text style={styles.smallButtonText}>Distract</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.smallButton, showBreathing && styles.activeButton]} 
-              onPress={startBreathingExercise}
-              activeOpacity={0.7}
-            >
-              <Icon name="weather-windy" size={20} color="#fff" />
-              <Text style={styles.smallButtonText}>Breathe</Text>
-            </TouchableOpacity>
-          </View>
-
-          {showTips && (
-            <View style={styles.tipsContainer}>
-              <Text style={styles.sectionTitle}>Urge Management Tips</Text>
-              <Text style={styles.tipText}>• The urge will pass whether you use or not - it typically lasts 15-30 minutes</Text>
-              <Text style={styles.tipText}>• Rate your urge from 1-10 and watch it change</Text>
-              <Text style={styles.tipText}>• Play the tape forward - imagine the consequences of giving in</Text>
-              <Text style={styles.tipText}>• Remember your reasons for staying sober</Text>
-              <Text style={styles.tipText}>• Delay any decision - tell yourself "not now, maybe later"</Text>
+          {emergencyContacts.map((contact) => (
+            <View key={contact.id} style={styles.contactCard}>
+              <View style={styles.contactInfo}>
+                {isEditing ? (
+                  <>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Contact Name"
+                      value={contact.name}
+                      onChangeText={(text) => handleContactChange(contact.id, 'name', text)}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Phone Number"
+                      value={contact.number}
+                      onChangeText={(text) => handleContactChange(contact.id, 'number', text)}
+                      keyboardType="phone-pad"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.contactName}>{contact.name || 'Unnamed Contact'}</Text>
+                    <Text style={styles.contactNumber}>{contact.number || 'No number set'}</Text>
+                  </>
+                )}
+              </View>
+              {!isEditing && contact.number && (
+                <TouchableOpacity
+                  style={styles.callButton}
+                  onPress={() => makeCall(contact.number)}
+                >
+                  <Ionicons name="call" size={24} color="#fff" />
+                </TouchableOpacity>
+              )}
             </View>
-          )}
+          ))}
 
-          {showDistractions && (
-            <View style={styles.tipsContainer}>
-              <Text style={styles.sectionTitle}>Quick Distractions</Text>
-              {distractionActivities.map((activity, index) => (
-                <Text key={index} style={styles.tipText}>• {activity}</Text>
-              ))}
-            </View>
-          )}
-
-          {showBreathing && (
-            <View style={styles.breathingContainer}>
-              <Text style={styles.sectionTitle}>Calming Breath Exercise</Text>
-              <Text style={styles.breathPhaseText}>
-                {breathPhase === 'inhale' ? 'Breathe IN (4 sec)' : 
-                breathPhase === 'hold' ? 'Hold (2 sec)' : 'Breathe OUT (6 sec)'}
-              </Text>
-              <Animated.View style={[styles.breathCircle, { transform: [{ scale: scaleAnim }] }]}>
-                <Icon name="circle" size={100} color="#3498db" />
-              </Animated.View>
-              <Text style={styles.breathCount}>Cycle: {breathCount}/5</Text>
-              <Text style={styles.tipText}>Follow the circle's movement with your breath</Text>
-            </View>
+          {isEditing && (
+            <TouchableOpacity style={styles.saveButton} onPress={saveContacts}>
+              <Text style={styles.saveButtonText}>Save Contacts</Text>
+            </TouchableOpacity>
           )}
 
           <Text style={styles.emergencyTitle}>Emergency Contacts</Text>
@@ -337,6 +394,13 @@ const PanicScreen = () => {
           </View>
         </Animated.View>
       </ScrollView>
+
+      <TouchableOpacity
+        style={styles.panicButton}
+        onPress={handlePanicButtonPress}
+      >
+        <Text style={styles.panicButtonText}>EMERGENCY</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -365,8 +429,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
   },
-  headerRightPlaceholder: {
-    width: 24,
+  editButton: {
+    padding: 5,
   },
   container: {
     flexGrow: 1,
@@ -462,17 +526,53 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  contactButton: {
-    backgroundColor: '#2c3e50',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
-    width: '100%',
+  contactCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
   },
-  contactText: {
-    color: '#fff',
+  contactInfo: {
+    flex: 1,
+  },
+  contactName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  contactNumber: {
     fontSize: 14,
-    textAlign: 'center',
+    color: '#666',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 8,
+    fontSize: 16,
+  },
+  callButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   emergencyButton: {
     backgroundColor: '#e74c3c',
@@ -510,6 +610,18 @@ const styles = StyleSheet.create({
     color: '#7f8c8d',
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  panicButton: {
+    backgroundColor: '#FF3B30',
+    borderRadius: 12,
+    padding: 20,
+    margin: 16,
+    alignItems: 'center',
+  },
+  panicButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

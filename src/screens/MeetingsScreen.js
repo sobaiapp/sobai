@@ -23,6 +23,7 @@ const MeetingsScreen = ({ navigation }) => {
   const renderLoadingIndicator = () => (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#000" />
+      <Text style={styles.loadingText}>Loading meetings...</Text>
     </View>
   );
 
@@ -71,7 +72,6 @@ const MeetingsScreen = ({ navigation }) => {
         allowsInlineMediaPlayback
         javaScriptEnabled
         domStorageEnabled
-        renderLoading={() => renderLoadingIndicator()}
       />
     </SafeAreaView>
   );
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#000',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -128,6 +129,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.8)',
     zIndex: 10,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#000',
   },
   webview: {
     flex: 1,

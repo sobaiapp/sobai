@@ -7,6 +7,7 @@ import DaysSoberCard from '../components/DaysSoberCard'; // Import component
 import { Animated, Easing } from 'react-native'; // Import Animated API
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CircularProgress } from 'react-native-circular-progress';
 
 const HomeScreen = ({ navigation }) => {
   const [startDate, setStartDate] = useState(null);
@@ -20,10 +21,12 @@ const HomeScreen = ({ navigation }) => {
   const [sponsorPhone, setSponsorPhone] = useState('');
   const [isFirstCall, setIsFirstCall] = useState(true);
   const shineAnim = useRef(new Animated.Value(0)).current;
+  const [totalCheckIns, setTotalCheckIns] = useState(0);
 
   useEffect(() => {
     loadStartDate();
     checkSponsorPhone();
+    loadTotalCheckIns();
     // Start animation when the screen loads
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -150,6 +153,17 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const loadTotalCheckIns = async () => {
+    try {
+      const checkIns = await AsyncStorage.getItem('totalCheckIns');
+      if (checkIns) {
+        setTotalCheckIns(parseInt(checkIns));
+      }
+    } catch (error) {
+      console.error('Error loading check-ins:', error);
+    }
+  };
+
   return (
     <LinearGradient
       colors={['#F0F8FF', '#FFF0F5', '#F0F8FF']}
@@ -221,20 +235,61 @@ const HomeScreen = ({ navigation }) => {
         <Animated.View style={[styles.cardContainer, { opacity: fadeAnim }]}>
           {/* Check-In Card */}
           <View style={styles.card2}>
-            <Ionicons name="calendar" size={38} color="#323232" style={styles.cardIcon} />
-            <Text style={styles.cardTitle}>Daily Check-In</Text>
-            <Text style={styles.checkInText}>How are you feeling today?</Text>
+            <Text style={styles.card2Title}>Daily Check-In</Text>
+            <View style={styles.healthProgressContainer}>
+              <CircularProgress
+                size={100}
+                width={10}
+                fill={Math.min((totalCheckIns / 30) * 100, 100)}
+                tintColor="#000"
+                backgroundColor="#ddd"
+                rotation={0}
+                lineCap="round"
+              >
+                {(fill) => (
+                  <View style={styles.healthProgressTextContainer}>
+                    <Text style={styles.healthProgressText}>{totalCheckIns}</Text>
+                    <Text style={styles.healthProgressLabel}>Current Streak</Text>
+                  </View>
+                )}
+              </CircularProgress>
+            </View>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CheckIn')}>
-              <Text style={styles.buttonText}>Check-In Now</Text>
+              <Text style={styles.buttonText}>Check-In</Text>
             </TouchableOpacity>
           </View>
 
           {/* Health Card */}
           <View style={styles.card2}>
-            <Ionicons name="fitness" size={38} color="#0" style={styles.cardIcon} />
-            <Text style={styles.cardTitle}>Health</Text>
-            <Text style={styles.healthText}>Improvement in Sleep: 15%</Text>
-            <Text style={styles.healthText}>Energy Levels: 20% Increase</Text>
+            <Text style={styles.card2Title}>Health</Text>
+            <View style={styles.healthProgressContainer}>
+              <CircularProgress
+                size={100}
+                width={10}
+                fill={75}
+                tintColor="#000"
+                backgroundColor="#ddd"
+                rotation={0}
+                lineCap="round"
+              >
+                {(fill) => (
+                  <View style={styles.healthProgressTextContainer}>
+                    <Text style={styles.healthProgressText}>{Math.round(fill)}%</Text>
+                    <Text style={styles.healthProgressLabel}>Overall</Text>
+                  </View>
+                )}
+              </CircularProgress>
+            </View>
+            <View style={styles.healthStatsContainer}>
+              <View style={styles.healthStat}>
+                <Text style={styles.healthStatLabel}>Sleep</Text>
+                <Text style={styles.healthStatValue}>15%</Text>
+              </View>
+              <View style={styles.healthStat}>
+                <Text style={styles.healthStatLabel}>Energy</Text>
+                <Text style={styles.healthStatValue}>20%</Text>
+              </View>
+            </View>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Health')}>
               <Text style={styles.buttonText}>Track Health</Text>
             </TouchableOpacity>
@@ -256,7 +311,7 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.cardTitle}>Challenges & Goals</Text>
             <Text style={styles.challengeText}>New Challenge: 7 Days Without Sugar!</Text>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Challenges')}>
-              <Text style={styles.buttonText}>Start Challenge</Text>
+              <Text style={styles.buttonText}>Start Now</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -326,7 +381,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     borderRadius: 12,
-    padding: 20,
+    padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -340,7 +395,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   counter: {
     fontSize: 42,
@@ -383,16 +438,18 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     borderRadius: 30,
-    marginBottom: 10,
+    marginTop: 20,
     elevation: 3,
+    minWidth: 100,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
@@ -453,17 +510,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardContainer: {
-    flexDirection: 'row',  // Align cards in a row
-    flexWrap: 'wrap',      // Wrap to the next line if necessary
-    justifyContent: 'flex-start',  // Align items to the left
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 5,
+    marginTop: 20,
   },
   card2: {
-    width: '47%',
+    width: '48%',
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     borderRadius: 12,
-    padding: 20,
-    margin: 5,
-    marginBottom: 15,
+    padding: 15,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -471,28 +529,51 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
     backdropFilter: 'blur(10px)',
+    alignItems: 'center',
   },
-  cardTitle: {
-    fontSize: 18,
+  card2Title: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 5,
-    borderRadius: 30,
-    marginTop: 10,
-    elevation: 3,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 12,
+    marginBottom: 20,
     textAlign: 'center',
-    fontWeight: 'bold',
   },
-  // New styles for phone modal
+  healthProgressContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  healthProgressTextContainer: {
+    alignItems: 'center',
+  },
+  healthProgressText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 5,
+  },
+  healthProgressLabel: {
+    fontSize: 20,
+    color: '#555',
+  },
+  healthStatsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 20,
+    width: '100%',
+  },
+  healthStat: {
+    alignItems: 'center',
+  },
+  healthStatLabel: {
+    fontSize: 18,
+    color: '#555',
+    marginBottom: 5,
+  },
+  healthStatValue: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -533,5 +614,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  healthProgressContainer: {
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  healthProgressTextContainer: {
+    alignItems: 'center',
+  },
+  healthProgressText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  healthProgressLabel: {
+    fontSize: 12,
+    color: '#555',
+    marginTop: 4,
+  },
+  healthStatsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
+    width: '100%',
+  },
+  healthStat: {
+    alignItems: 'center',
+  },
+  healthStatLabel: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 4,
+  },
+  healthStatValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
   },
 });

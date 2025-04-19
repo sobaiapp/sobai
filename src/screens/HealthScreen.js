@@ -152,6 +152,7 @@ const HealthScreen = () => {
   const [isMealModalVisible, setIsMealModalVisible] = useState(false);
   const [meals, setMeals] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(false);
+  const [insights, setInsights] = useState([]);
 
   useEffect(() => {
     loadProfile();
@@ -195,6 +196,71 @@ const HealthScreen = () => {
     }
   };
 
+  const generateInsights = () => {
+    const newInsights = [];
+    
+    // Sleep Quality Insight
+    if (healthStats.sleepHours > 0) {
+      const sleepQuality = healthStats.sleepHours >= 7 ? 'good' : 'needs improvement';
+      newInsights.push({
+        id: '1',
+        title: 'Sleep Quality',
+        content: `Your average sleep duration is ${healthStats.sleepHours.toFixed(1)} hours. ${sleepQuality === 'good' ? 'Great job maintaining healthy sleep habits!' : 'Try to aim for 7-9 hours of sleep for optimal recovery.'}`,
+        icon: 'moon',
+        type: 'sleep'
+      });
+    }
+
+    // Activity Level Insight
+    if (healthStats.stepsToday > 0) {
+      const activityLevel = healthStats.stepsToday >= 10000 ? 'active' : 'moderate';
+      newInsights.push({
+        id: '2',
+        title: 'Activity Level',
+        content: `You've taken ${healthStats.stepsToday.toLocaleString()} steps today. ${activityLevel === 'active' ? 'Excellent activity level!' : 'Try to reach 10,000 steps for optimal health benefits.'}`,
+        icon: 'stats-chart',
+        type: 'activity'
+      });
+    }
+
+    // Heart Health Insight
+    if (healthStats.heartRate > 0) {
+      const heartHealth = healthStats.heartRate < 80 ? 'good' : 'elevated';
+      newInsights.push({
+        id: '3',
+        title: 'Heart Health',
+        content: `Your current heart rate is ${healthStats.heartRate} BPM. ${heartHealth === 'good' ? 'Your heart rate is in a healthy range.' : 'Consider adding more cardio exercises to improve heart health.'}`,
+        icon: 'heart',
+        type: 'heart'
+      });
+    }
+
+    // Hydration Insight
+    if (healthStats.waterIntake > 0) {
+      const hydrationLevel = healthStats.waterIntake >= 2.5 ? 'good' : 'needs improvement';
+      newInsights.push({
+        id: '4',
+        title: 'Hydration',
+        content: `You've consumed ${healthStats.waterIntake.toFixed(1)}L of water today. ${hydrationLevel === 'good' ? 'Great job staying hydrated!' : 'Try to drink at least 2.5L of water daily.'}`,
+        icon: 'water',
+        type: 'hydration'
+      });
+    }
+
+    // Recovery Progress Insight
+    if (healthStats.daysSober > 0) {
+      newInsights.push({
+        id: '5',
+        title: 'Recovery Progress',
+        content: `You've been sober for ${healthStats.daysSober} days. Your commitment to health and wellness is showing in your daily activities.`,
+        icon: 'trophy',
+        type: 'recovery'
+      });
+    }
+
+    setInsights(newInsights);
+  };
+
   const updateHealthStats = (steps) => {
     // Calculate estimated calories based on steps (rough estimate: 1 step = 0.04 calories)
     const estimatedCalories = Math.round(steps * 0.04);
@@ -212,6 +278,7 @@ const HealthScreen = () => {
       waterIntake: 2.5, // Default value in liters
       connectHealth: pedometerAvailable ? 'Connected' : 'Not Connected'
     });
+    generateInsights();
   };
 
   const loadProfile = async () => {
@@ -309,10 +376,14 @@ const HealthScreen = () => {
   const renderInsight = ({ item }) => (
     <View style={styles.insightCard}>
       <View style={styles.insightHeader}>
-        <Ionicons name={item.icon} size={20} color="#4CAF50" />
+        <Ionicons name={item.icon} size={24} color="#4A90E2" />
         <Text style={styles.insightTitle}>{item.title}</Text>
       </View>
       <Text style={styles.insightContent}>{item.content}</Text>
+      <View style={styles.insightFooter}>
+        <Text style={styles.insightType}>{item.type.toUpperCase()}</Text>
+        <Text style={styles.insightTime}>Updated just now</Text>
+      </View>
     </View>
   );
 
@@ -492,7 +563,7 @@ const HealthScreen = () => {
             <View style={styles.tabContent}>
               <Text style={styles.sectionTitle}>Health Insights</Text>
               <FlatList
-                data={INSIGHTS}
+                data={insights}
                 renderItem={renderInsight}
                 keyExtractor={item => item.id}
                 scrollEnabled={false}
@@ -662,6 +733,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     lineHeight: 20,
+  },
+  insightFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  insightType: {
+    fontSize: 12,
+    color: '#6c757d',
+  },
+  insightTime: {
+    fontSize: 12,
+    color: '#6c757d',
   },
   metricCard: {
     backgroundColor: '#FFFFFF',

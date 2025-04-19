@@ -56,47 +56,50 @@ const MeditationScreen = () => {
   ];
 
   return (
-    
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Back button */}
-      <View style={styles.topSection}>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-back-outline" size={28} color="black" />
+          <Icon name="arrow-back-outline" size={28} color="#000" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Meditation</Text>
+        <View style={styles.headerRight} />
       </View>
 
-      {/* Meditation Categories */}
-      {meditationCategories.map((category, index) => (
-        <View key={index} style={styles.categorySection}>
-          <Text style={styles.categoryHeader}>{category.title}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {category.items.map((item, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={styles.card}
-                onPress={() => {
-                  if (item.title === 'Mindfulness') {
-                    navigation.navigate('Mindfulness'); // Navigate to MindfulnessScreen
-                  } else if (item.title === 'Guided Meditation') {
-                    navigation.navigate('GuidedMeditation'); // Navigate to GuidedMeditationScreen
-                  }
-                  else if (item.title === 'Breathing Exercise') {
-                    navigation.navigate('Breathing'); // Navigate to GuidedMeditationScreen
-                  }
-                  else if (item.title === 'Visualization') {
-                    navigation.navigate('Visualization'); // Navigate to GuidedMeditationScreen
-                  }
-                }}
-              >
-                <Image source={{ uri: item.image }} style={styles.cardImage} />
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <Text style={styles.cardDescription}>{item.description}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      ))}
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Meditation Categories */}
+        {meditationCategories.map((category, index) => (
+          <View key={index} style={styles.categorySection}>
+            <Text style={styles.categoryHeader}>{category.title}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {category.items.map((item, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={styles.card}
+                  onPress={() => {
+                    if (item.title === 'Mindfulness') {
+                      navigation.navigate('Mindfulness');
+                    } else if (item.title === 'Guided Meditation') {
+                      navigation.navigate('GuidedMeditation');
+                    }
+                    else if (item.title === 'Breathing Exercise') {
+                      navigation.navigate('Breathing');
+                    }
+                    else if (item.title === 'Visualization') {
+                      navigation.navigate('Visualization');
+                    }
+                  }}
+                >
+                  <Image source={{ uri: item.image }} style={styles.cardImage} />
+                  <Text style={styles.cardTitle}>{item.title}</Text>
+                  <Text style={styles.cardDescription}>{item.description}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
@@ -104,62 +107,73 @@ export default MeditationScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: '#f1f1f1',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 40,
   },
-  topSection: {
-    width: '100%',
-    paddingBottom: 40,
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   backButton: {
-    position: 'absolute',
-    top: 0,
-    left: 10,
-    zIndex: 10,
+    padding: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
+  headerRight: {
+    width: 28,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   cardsContainer: {
     marginTop: 20,
     marginBottom: 20,
   },
   card: {
-    width: 300,
+    width: 280,
+    marginRight: 12,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 12,
     backgroundColor: '#fff',
-    padding: 15,
-    marginRight: 15,
-    marginBottom: 15,
-    borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowRadius: 2,
+    elevation: 2,
   },
   cardImage: {
     width: '100%',
-    height: 120,
-    borderRadius: 10,
-    marginBottom: 10,
+    height: 140,
+    borderRadius: 8,
+    marginBottom: 8,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   cardDescription: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 12,
+    color: '#666',
   },
   categorySection: {
-    marginTop: 20,
+    marginTop: 12,
   },
   categoryHeader: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
   },
 });

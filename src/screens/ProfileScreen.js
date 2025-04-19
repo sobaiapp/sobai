@@ -77,12 +77,12 @@ const ProfileScreen = ({ navigation, route }) => {
             index: 0,
             routes: [{ name: 'Start' }]
           });
-          return;
-        }
+        return;
+          }
         if (user) {
           loadProfileData();
         }
-      } catch (error) {
+            } catch (error) {
         console.error('Session verification error:', error);
         navigation.reset({
           index: 0,
@@ -121,16 +121,29 @@ const ProfileScreen = ({ navigation, route }) => {
       
       console.log('Loading profile data for user:', user.$id);
       
-      // Load user's profile
-      let profile = await getUserProfile(user.$id);
+      // Load user's profile from the profiles collection
+      const profileResponse = await databases.listDocuments(
+        DATABASE_ID,
+        PROFILES_COLLECTION_ID,
+        [Query.equal('userId', user.$id)]
+      );
+
+      let profile = profileResponse.documents[0];
       
       if (!profile) {
         console.log('No profile found, creating new one...');
         // Create a new profile if one doesn't exist
-        profile = await createUserProfile(user.$id, {
-          name: user.name,
-          email: user.email
-        });
+        profile = await databases.createDocument(
+          DATABASE_ID,
+          PROFILES_COLLECTION_ID,
+          'unique()',
+          {
+            userId: user.$id,
+            name: user.name,
+            email: user.email,
+            createdAt: new Date().toISOString()
+          }
+        );
       }
 
       setLocalProfile(profile);
@@ -170,7 +183,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
     } catch (error) {
       console.error('Error loading profile data:', error);
-      setError('Failed to load profile data');
+      setError('Failed to load profile data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -180,7 +193,7 @@ const ProfileScreen = ({ navigation, route }) => {
   if (authLoading || loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
   }

@@ -203,7 +203,7 @@ const PaywallScreenTwo = ({ navigation }) => {
           >
             <Text style={styles.subscribeText}>
               {loading ? 'Processing...' : 
-                selectedPlan === 'Yearly' ? 'Start Free Trial' : 'Continue'}
+                selectedPlan === 'Yearly' ? 'Start Free Trial' : 'Start My Journey'}
             </Text>
           </TouchableOpacity>
           
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   header: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   title: {
     fontSize: 28,
@@ -250,12 +250,17 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   benefitsContainer: {
-    marginBottom: 32,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 0,
   },
   benefitItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
+    width: '100%',
+    maxWidth: 300,
   },
   benefitIcon: {
     width: 40,
@@ -268,100 +273,111 @@ const styles = StyleSheet.create({
   },
   benefitContent: {
     flex: 1,
+    alignItems: 'flex-start',
   },
   benefitTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
     marginBottom: 4,
+    textAlign: 'left',
   },
   benefitText: {
     fontSize: 14,
     color: '#666666',
     lineHeight: 20,
+    textAlign: 'left',
   },
   plansContainer: {
-    marginBottom: 32,
+    marginTop: 'auto',
+    marginBottom: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
   },
   planButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F7F7F7',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    minHeight: 80,
   },
   selectedPlan: {
-    backgroundColor: '#F0F9FF',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#000000',
     borderWidth: 2,
-    borderColor: '#007AFF',
   },
   planContent: {
     flex: 1,
   },
   planName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#000000',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   planPrice: {
-    fontSize: 16,
-    color: '#007AFF',
+    fontSize: 15,
+    color: '#000000',
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   planBilling: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#666666',
   },
   planBadge: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: '#000000',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 12,
     alignSelf: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   planBadgeText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
   },
   planRadio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: '#CCCCCC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 16,
+    marginLeft: 12,
   },
   selectedRadio: {
-    borderColor: '#007AFF',
+    borderColor: '#000000',
   },
   radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: '#CCCCCC',
   },
   radioInnerSelected: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#007AFF',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#000000',
   },
   footer: {
-    marginTop: 'auto',
+    marginTop: 0,
+    paddingTop: 0,
   },
   subscribeButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000000',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   subscribeText: {
     color: '#FFFFFF',
@@ -369,12 +385,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   restoreButton: {
-    padding: 16,
+    padding: 12,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   restoreText: {
-    color: '#007AFF',
+    color: '#000000',
     fontSize: 16,
     fontWeight: '500',
   },

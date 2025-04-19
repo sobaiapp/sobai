@@ -10,21 +10,28 @@ import {
   ActivityIndicator,
   Appearance,
   Linking,
-  Platform
+  Platform,
+  Share
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { logoutUser, getCurrentUser } from '../services/appwrite';
+import { 
+  requestNotificationPermissions, 
+  scheduleDailyQuoteNotification,
+  checkNotificationsEnabled 
+} from '../services/notifications';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(Appearance.getColorScheme() === 'dark');
   const [settings, setSettings] = useState({
-    notifications: true,
+    notifications: false,
     hapticFeedback: true,
     appVersion: '1.0.0'
   });
@@ -34,9 +41,10 @@ const SettingsScreen = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [currentUser, savedSettings] = await Promise.all([
+        const [currentUser, savedSettings, notificationsEnabled] = await Promise.all([
           getCurrentUser(),
-          AsyncStorage.getItem('appSettings')
+          AsyncStorage.getItem('appSettings'),
+          checkNotificationsEnabled()
         ]);
         
         setUser(currentUser);
@@ -47,6 +55,7 @@ const SettingsScreen = () => {
             setDarkMode(parsedSettings.darkMode);
           }
         }
+        setSettings(prev => ({ ...prev, notifications: notificationsEnabled }));
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -123,11 +132,61 @@ const SettingsScreen = () => {
     );
   };
 
-  const toggleSetting = (setting) => {
+  const toggleSetting = async (setting) => {
     if (settings.hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setSettings(prev => ({ ...prev, [setting]: !prev[setting] }));
+
+    if (setting === 'notifications') {
+      setNotificationsLoading(true);
+      const newValue = !settings.notifications;
+      
+      try {
+        if (newValue) {
+          const granted = await requestNotificationPermissions();
+          if (!granted) {
+            Alert.alert(
+              'Permission Required',
+              'Please enable notifications in your device settings to receive daily motivational quotes.',
+              [{ text: 'OK' }]
+            );
+            setNotificationsLoading(false);
+            return;
+          }
+        }
+        
+        // Update the UI immediately
+        setSettings(prev => ({ ...prev, notifications: newValue }));
+        
+        // Schedule notifications in the background
+        scheduleDailyQuoteNotification(newValue).then(() => {
+          setNotificationsLoading(false);
+          if (newValue) {
+            Alert.alert(
+              'Notifications Enabled',
+              'You should receive a test notification shortly. Daily motivational quotes will be sent at 9 AM.',
+              [{ text: 'OK' }]
+            );
+          } else {
+            Alert.alert(
+              'Notifications Disabled',
+              'Daily motivational quotes have been turned off.',
+              [{ text: 'OK' }]
+            );
+          }
+        });
+      } catch (error) {
+        console.error('Error toggling notifications:', error);
+        setNotificationsLoading(false);
+        Alert.alert(
+          'Error',
+          'Failed to update notification settings. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
+    } else {
+      setSettings(prev => ({ ...prev, [setting]: !prev[setting] }));
+    }
   };
 
   const toggleDarkMode = () => {
@@ -167,7 +226,32 @@ const SettingsScreen = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    Linking.openURL('mailto:support@example.com?subject=App Support');
+    Linking.openURL('mailto:support@sobai.app?subject=App Support');
+  };
+
+  const openWebsite = () => {
+    if (settings.hapticFeedback) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    Linking.openURL('https://www.sobai.app');
+  };
+
+  const shareApp = async () => {
+    if (settings.hapticFeedback) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    try {
+      const message = 'Check out SobAi - Your Personal Sobriety Companion! Download it here: https://www.sobai.app';
+      await Share.share({
+        message,
+        title: 'Share SobAi',
+      });
+    } catch (error) {
+      console.error('Error sharing app:', error);
+      Alert.alert('Error', 'Failed to share the app. Please try again.');
+    }
   };
 
   const SettingItem = ({ 
@@ -179,7 +263,8 @@ const SettingsScreen = () => {
     switchValue,
     onSwitchChange,
     isLast = false,
-    isDestructive = false
+    isDestructive = false,
+    isLoading = false
   }) => (
     <TouchableOpacity
       style={[
@@ -190,6 +275,7 @@ const SettingsScreen = () => {
       ]}
       onPress={onPress}
       activeOpacity={0.7}
+      disabled={isLoading}
     >
       <View style={styles.itemContent}>
         <Ionicons 
@@ -208,12 +294,16 @@ const SettingsScreen = () => {
       </View>
       
       {isSwitch ? (
-        <Switch
-          value={switchValue}
-          onValueChange={onSwitchChange}
-          trackColor={{ false: '#767577', true: darkMode ? '#4CD964' : '#34C759' }}
-          thumbColor="#fff"
-        />
+        isLoading ? (
+          <ActivityIndicator size="small" color={darkMode ? '#fff' : '#333'} />
+        ) : (
+          <Switch
+            value={switchValue}
+            onValueChange={onSwitchChange}
+            trackColor={{ false: '#767577', true: darkMode ? '#4CD964' : '#34C759' }}
+            thumbColor="#fff"
+          />
+        )
       ) : (
         <Text style={[
           styles.itemValue,
@@ -286,6 +376,7 @@ const SettingsScreen = () => {
           isSwitch={true}
           switchValue={settings.notifications}
           onSwitchChange={() => toggleSetting('notifications')}
+          isLoading={notificationsLoading}
         />
         <SettingItem
           icon="moon-outline"
@@ -314,12 +405,12 @@ const SettingsScreen = () => {
         <SettingItem
           icon="chatbubble-ellipses-outline"
           label="Contact Us"
-          onPress={() => navigation.navigate('Contact')}
+          onPress={openWebsite}
         />
         <SettingItem
-          icon="document-text-outline"
-          label="Terms & Privacy"
-          onPress={() => navigation.navigate('Legal')}
+          icon="mail-outline"
+          label="Support Email"
+          onPress={openSupportEmail}
           isLast={true}
         />
       </Section>
@@ -339,7 +430,7 @@ const SettingsScreen = () => {
         <SettingItem
           icon="share-social-outline"
           label="Share App"
-          onPress={() => {}}
+          onPress={shareApp}
           isLast={true}
         />
       </Section>
@@ -357,19 +448,12 @@ const SettingsScreen = () => {
           onPress={() => openLegalLink('privacy')}
         />
         <SettingItem
-          icon="mail-outline"
-          label="Support Email"
-          onPress={openSupportEmail}
+          icon="trash-outline"
+          label="Delete Account"
+          onPress={confirmDeleteAccount}
+          isDestructive={true}
+          isLast={true}
         />
-        {user && (
-          <SettingItem
-            icon="trash-outline"
-            label="Delete Account"
-            onPress={confirmDeleteAccount}
-            isDestructive={true}
-            isLast={true}
-          />
-        )}
       </Section>
 
       {/* Logout Section */}

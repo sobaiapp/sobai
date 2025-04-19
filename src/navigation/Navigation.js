@@ -43,7 +43,6 @@ import ProgressScreen from '../screens/ProgressScreen';
 import TriggersScreen from '../screens/TriggersScreen';
 import Header from '../components/Header';
 import GamesScreen from '../screens/GamesScreen';
-import MilestonesScreen from '../screens/MilestonesScreen';
 import BreathingScreen from '../screens/BreathingScreen';
 import VisualizationScreen from '../screens/VisualizationScreen';
 import BodyWeightScreen from '../screens/BodyWeightScreen';
@@ -62,6 +61,7 @@ import ReactionGame from '../screens/ReactionGame';
 import WordChain from '../screens/WordChain';
 import WordPuzzle from '../screens/WordPuzzle';
 import MealList from '../screens/MealList';
+import CopingStrategiesScreen from '../screens/CopingStrategiesScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -218,7 +218,6 @@ const Navigation = () => {
           <Stack.Screen name="Mindfulness" component={MindfulnessScreen} />
           <Stack.Screen name="GuidedMeditation" component={GuidedMeditationScreen} />
           <Stack.Screen name="Progress" component={ProgressScreen} />
-          <Stack.Screen name="Milestones" component={MilestonesScreen} />
           <Stack.Screen name="Triggers" component={TriggersScreen} />
           <Stack.Screen name="Breathing" component={BreathingScreen} />
           <Stack.Screen name="Visualization" component={VisualizationScreen} />
@@ -235,6 +234,7 @@ const Navigation = () => {
           <Stack.Screen name="WordChain" component={WordChain} />
           <Stack.Screen name="WordPuzzle" component={WordPuzzle} />
           <Stack.Screen name="MealList" component={MealList} />
+          <Stack.Screen name="CopingStrategies" component={CopingStrategiesScreen} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

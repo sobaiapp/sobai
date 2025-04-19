@@ -10,10 +10,30 @@ const Header = ({ title }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-width * 0.7)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const menuItemAnims = useRef([]).current;
   const navigation = useNavigation();
+
+  const menuItems = [
+    { icon: "home", text: "Home", screen: "Home" },
+    { icon: "notebook", text: "Journal", screen: "JournalScreen" },
+    { icon: "meditation", text: "Meditation", screen: "MeditationScreen" },
+    { icon: "account-group", text: "Community", screen: "CommunityScreen" },
+    { icon: "game-controller-outline", text: "Games", screen: "Games", iconSet: Ionicons },
+    { icon: "chart-line", text: "Progress", screen: "Progress" },
+    { icon: "trophy-outline", text: "Achievements", screen: "Achievements", iconSet: Ionicons },
+    { icon: "alert-circle", text: "Triggers", screen: "Triggers" },
+    { icon: "book-open-outline", text: "Resources", screen: "ResourcesScreen" },
+    { icon: "headset", text: "Support", screen: "SupportScreen" },
+  ];
+
+  // Initialize animations for each menu item
+  menuItems.forEach((_, index) => {
+    menuItemAnims[index] = useRef(new Animated.Value(0)).current;
+  });
 
   const toggleMenu = () => {
     if (menuVisible) {
+      // Close menu
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: -width * 0.7,
@@ -25,8 +45,16 @@ const Header = ({ title }) => {
           duration: 200,
           useNativeDriver: true,
         }),
+        ...menuItemAnims.map(anim => 
+          Animated.timing(anim, {
+            toValue: 0,
+            duration: 150,
+            useNativeDriver: true,
+          })
+        ),
       ]).start(() => setMenuVisible(false));
     } else {
+      // Open menu
       setMenuVisible(true);
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -39,7 +67,17 @@ const Header = ({ title }) => {
           duration: 300,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => {
+        // Animate menu items sequentially
+        menuItemAnims.forEach((anim, index) => {
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 200,
+            delay: index * 50, // 50ms delay between each item
+            useNativeDriver: true,
+          }).start();
+        });
+      });
     }
   };
 
@@ -103,31 +141,31 @@ const Header = ({ title }) => {
           style={styles.menuList}
           showsVerticalScrollIndicator={false}
         >
-          {[
-            { icon: "home", text: "Home", screen: "Home" },
-            { icon: "notebook", text: "Journal", screen: "JournalScreen" },
-            { icon: "meditation", text: "Meditation", screen: "MeditationScreen" },
-            { icon: "account-group", text: "Community", screen: "CommunityScreen" },
-            { icon: "game-controller-outline", text: "Games", screen: "Games", iconSet: Ionicons },
-            { icon: "chart-line", text: "Progress", screen: "Progress" },
-            { icon: "trophy", text: "Milestones", screen: "Milestones" },
-            { icon: "trophy-outline", text: "Achievements", screen: "Achievements", iconSet: Ionicons },
-            { icon: "alert-circle", text: "Triggers", screen: "Triggers" },
-            { icon: "book-open-outline", text: "Resources", screen: "ResourcesScreen" },
-            { icon: "headset", text: "Support", screen: "SupportScreen" },
-          ].map((item, index) => {
+          {menuItems.map((item, index) => {
             const IconComponent = item.iconSet || Icon;
             return (
-              <TouchableOpacity 
+              <Animated.View
                 key={index}
-                style={styles.menuItem}
-                onPress={() => handleNavigation(item.screen)}
-                activeOpacity={0.7}
+                style={{
+                  opacity: menuItemAnims[index],
+                  transform: [{
+                    translateX: menuItemAnims[index].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-20, 0]
+                    })
+                  }]
+                }}
               >
-                <IconComponent name={item.icon} size={24} color="#555" />
-                <Text style={styles.menuText}>{item.text}</Text>
-                <Icon name="chevron-right" size={20} color="#aaa" style={styles.menuArrow} />
-              </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.menuItem}
+                  onPress={() => handleNavigation(item.screen)}
+                  activeOpacity={0.7}
+                >
+                  <IconComponent name={item.icon} size={24} color="#555" />
+                  <Text style={styles.menuText}>{item.text}</Text>
+                  <Icon name="chevron-right" size={20} color="#aaa" style={styles.menuArrow} />
+                </TouchableOpacity>
+              </Animated.View>
             );
           })}
         </ScrollView>

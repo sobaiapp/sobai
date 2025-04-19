@@ -405,7 +405,7 @@ const WorkoutDetailScreen = ({ route, navigation }) => {
         {/* Workout Detail Modal */}
         {selectedWorkout && (
           <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
+            <ScrollView style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{selectedWorkout.name}</Text>
                 <TouchableOpacity 
@@ -467,7 +467,7 @@ const WorkoutDetailScreen = ({ route, navigation }) => {
                   </>
                 )}
               </TouchableOpacity>
-            </View>
+            </ScrollView>
           </View>
         )}
       </View>
