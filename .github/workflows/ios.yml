@@ -27,15 +27,13 @@ jobs:
         run: npm install -g eas-cli
         
       - name: Configure EAS
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           echo "Configuring EAS..."
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          eas login --token ${{ secrets.EXPO_TOKEN }}
           eas build:configure
           
       - name: Build iOS app
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform ios --non-interactive
         
       - name: Upload IPA
