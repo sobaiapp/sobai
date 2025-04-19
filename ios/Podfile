@@ -13,6 +13,22 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
+# Flipper configuration
+def flipper_pods
+  return if ENV['NO_FLIPPER'] == "1"
+  pod 'Flipper', :configuration => :debug
+  pod 'Flipper-DoubleConversion', :configuration => :debug
+  pod 'Flipper-Folly', :configuration => :debug
+  pod 'Flipper-Glog', :configuration => :debug
+  pod 'Flipper-PeerTalk', :configuration => :debug
+  pod 'Flipper-RSocket', :configuration => :debug
+  pod 'FlipperKit', :configuration => :debug
+  pod 'FlipperKit/FlipperKitLayoutPlugin', :configuration => :debug
+  pod 'FlipperKit/SKIOSNetworkPlugin', :configuration => :debug
+  pod 'FlipperKit/FlipperKitUserDefaultsPlugin', :configuration => :debug
+  pod 'FlipperKit/FlipperKitReactPlugin', :configuration => :debug
+end
+
 target 'SobAi' do
   use_expo_modules!
 
@@ -43,6 +59,8 @@ target 'SobAi' do
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
+
+  flipper_pods
 
   post_install do |installer|
     react_native_post_install(
