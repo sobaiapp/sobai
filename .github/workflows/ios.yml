@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      EAS_ACCESS_TOKEN: ${{ secrets.EAS_TOKEN }}  # Set the EAS_ACCESS_TOKEN environment variable for the entire job
+
     steps:
       - uses: actions/checkout@v3
       
@@ -30,8 +33,6 @@ jobs:
         run: |
           echo "Configuring EAS..."
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-          env: 
-             EAS_ACCESS_TOKEN: ${{ secrets.EAS_TOKEN }}
           eas build:configure
           
       - name: Build iOS app
