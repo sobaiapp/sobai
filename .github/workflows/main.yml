@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: iOS Build and Deploy
 
 on:
   push:
@@ -8,23 +8,33 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    env:
+      EAS_ACCESS_TOKEN: ${{ secrets.EAS_TOKEN }}
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
-        run: npm install
-        
+        run: |
+          npm install
+          npx expo install --fix
+
       - name: Install EAS CLI
         run: npm install -g eas-cli
-        
-      - name: Login to EAS
-        run: eas login --token ${{ secrets.EXPO_TOKEN }}
-        
-      - name: Build with EAS
-        run: eas build --platform ios --non-interactive 
+
+      - name: Build iOS App with EAS
+        run: eas build --platform ios --non-interactive
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SobAi.ipa
+          path: dist/*.ipa
