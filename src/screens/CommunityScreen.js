@@ -156,7 +156,7 @@ const CommunityScreen = () => {
       setLoading(true);
       const postData = {
         userId: currentUser.$id,
-        content: postText,
+      content: postText,
         likes: [],
         comments: [],
         createdAt: new Date().toISOString(),
@@ -195,13 +195,13 @@ const CommunityScreen = () => {
       );
 
       // Reset form and refresh data
-      setPostText('');
-      setSelectedImage(null);
-      setModalVisible(false);
+    setPostText('');
+    setSelectedImage(null);
+    setModalVisible(false);
       await loadPosts();
       
       // Show success feedback
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       console.error('Error creating post:', error);
       // Show error feedback
@@ -271,7 +271,7 @@ const CommunityScreen = () => {
             color={item.likes?.includes(currentUser?.$id) ? "#ff0000" : "#6c757d"} 
           />
           <Text style={styles.postActionText}>{item.likes?.length || 0}</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
         <TouchableOpacity style={styles.postAction}>
           <Ionicons name="chatbubble-outline" size={20} color="#6c757d" />
           <Text style={styles.postActionText}>{item.comments?.length || 0}</Text>
@@ -279,13 +279,13 @@ const CommunityScreen = () => {
         <TouchableOpacity style={styles.postAction}>
           <Ionicons name="share-outline" size={20} color="#6c757d" />
           <Text style={styles.postActionText}>Share</Text>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
     </View>
   );
 
   const renderEventCard = (event) => (
-    <TouchableOpacity 
+            <TouchableOpacity 
       key={event.$id} 
       style={styles.eventCard}
       onPress={() => navigation.navigate('EventDetail', { eventId: event.$id })}
@@ -324,11 +324,11 @@ const CommunityScreen = () => {
       key={group.$id} 
       style={styles.supportGroupCard}
       onPress={() => navigation.navigate('GroupDetail', { groupId: group.$id })}
-    >
+            >
       <View style={styles.groupHeader}>
         <View style={styles.groupIconContainer}>
           <Ionicons name="people" size={24} color="#000" />
-        </View>
+          </View>
         <View style={styles.groupInfo}>
           <Text style={styles.groupName}>{group.name}</Text>
           <Text style={styles.groupLocation}>{group.location}</Text>
@@ -344,14 +344,14 @@ const CommunityScreen = () => {
           </View>
         ))}
       </View>
-    </TouchableOpacity>
+            </TouchableOpacity>
   );
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#000" />
-      </View>
+          </View>
     );
   }
 
@@ -395,15 +395,15 @@ const CommunityScreen = () => {
         </View>
 
         {activeTab === 'feed' ? (
-          <FlatList
+        <FlatList
             data={posts}
             renderItem={renderPost}
             keyExtractor={item => item.$id}
             contentContainerStyle={styles.feedContent}
-            showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
             refreshing={loading}
             onRefresh={loadData}
-          />
+        />
         ) : activeTab === 'nearby' ? (
           <ScrollView style={styles.content}>
             <View style={styles.sectionHeader}>

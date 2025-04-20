@@ -1,4 +1,4 @@
-package com.sobai.app
+package com.sobai
 
 import android.os.Build
 import android.os.Bundle

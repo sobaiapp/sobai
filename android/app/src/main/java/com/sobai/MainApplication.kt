@@ -1,4 +1,4 @@
-package com.sobai.app
+package com.sobai
 
 import android.app.Application
 import android.content.res.Configuration

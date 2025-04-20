@@ -122,9 +122,9 @@ const ProfileScreen = ({ navigation, route }) => {
       console.log('Loading profile data for user:', user.$id);
       
       // Load user's profile from the profiles collection
-      const profileResponse = await databases.listDocuments(
-        DATABASE_ID,
-        PROFILES_COLLECTION_ID,
+        const profileResponse = await databases.listDocuments(
+          DATABASE_ID,
+          PROFILES_COLLECTION_ID,
         [Query.equal('userId', user.$id)]
       );
 
@@ -134,8 +134,8 @@ const ProfileScreen = ({ navigation, route }) => {
         console.log('No profile found, creating new one...');
         // Create a new profile if one doesn't exist
         profile = await databases.createDocument(
-          DATABASE_ID,
-          PROFILES_COLLECTION_ID,
+            DATABASE_ID,
+            PROFILES_COLLECTION_ID,
           'unique()',
           {
             userId: user.$id,
@@ -181,7 +181,7 @@ const ProfileScreen = ({ navigation, route }) => {
       setAchievements(achievementsData.documents);
       setPosts(postsData.documents);
 
-    } catch (error) {
+      } catch (error) {
       console.error('Error loading profile data:', error);
       setError('Failed to load profile data. Please try again.');
     } finally {

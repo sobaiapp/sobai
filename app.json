@@ -22,7 +22,9 @@
         "NSLocationAlwaysUsageDescription": "We need your location to find NA and AA meetings near you.",
         "NSCameraUsageDescription": "We need access to your camera to allow you to take profile pictures.",
         "NSPhotoLibraryUsageDescription": "We need access to your photo library to allow you to select profile pictures.",
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -37,8 +39,7 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ],
-      "useNextNotificationsApi": true
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -55,19 +56,25 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#ffffff",
-          "sounds": ["./assets/notification-sound.wav"]
+          "color": "#ffffff"
         }
       ]
     ],
     "owner": "mrposada",
-    "privacy": "public",
     "description": "SobAi is your personal sober companion, helping you stay on track with your recovery journey through daily motivation, community support, and personalized insights.",
     "updates": {
       "url": "https://u.expo.dev/3fcbfd7c-ba9a-4941-b4b5-bfad41e53a42"
     },
     "runtimeVersion": {
       "policy": "sdkVersion"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3fcbfd7c-ba9a-4941-b4b5-bfad41e53a42"
+      }
     }
   }
 }
