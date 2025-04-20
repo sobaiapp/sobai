@@ -1,20 +1,42 @@
 {
   "cli": {
-    "version": ">= 3.0.0"
+    "version": ">= 5.9.1",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true,
+        "cocoapods": "1.11.3"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium",
+        "cocoapods": "1.11.3"
+      }
     },
     "production": {
-      "distribution": "store"
+      "ios": {
+        "resourceClass": "m-medium",
+        "cocoapods": "1.11.3",
+        "image": "latest"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "frankposada4@icloud.com",
+        "ascAppId": "com.sobai.app",
+        "appleTeamId": "Q834NS68MG",
+        "sku": "com.sobai.app.1",
+        "language": "en-US",
+        "companyName": "SobAi"
+      }
+    }
   }
 }
