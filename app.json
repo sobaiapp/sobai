@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sobai.app",
+      "minVersion": "16.0",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need your location to find NA and AA meetings near you.",
         "NSLocationAlwaysUsageDescription": "We need your location to find NA and AA meetings near you.",
