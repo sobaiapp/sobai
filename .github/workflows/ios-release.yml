@@ -13,10 +13,10 @@ jobs:
   build-and-release:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           
@@ -39,7 +39,7 @@ jobs:
           xcodebuild -exportArchive -archivePath SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath .
           
       - name: Upload IPA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SobAi.ipa
           path: ios/SobAi.ipa 
