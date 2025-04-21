@@ -9,20 +9,20 @@
       "distribution": "internal",
       "ios": {
         "simulator": true,
-        "cocoapods": "1.11.3"
+        "cocoapods": "1.12.1"
       }
     },
     "preview": {
       "distribution": "internal",
       "ios": {
         "resourceClass": "m-medium",
-        "cocoapods": "1.11.3"
+        "cocoapods": "1.12.1"
       }
     },
     "production": {
       "ios": {
         "resourceClass": "m-medium",
-        "cocoapods": "1.11.3",
+        "cocoapods": "1.12.1",
         "image": "latest"
       }
     }
