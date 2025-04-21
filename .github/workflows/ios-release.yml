@@ -42,15 +42,20 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :PROVISIONING_PROFILE_SPECIFIER 'SobAi Distribution'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :DEVELOPMENT_TEAM 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :PRODUCT_BUNDLE_IDENTIFIER 'com.sobai.app'" SobAi.xcodeproj/project.pbxproj
+          # Set code signing identity
+          /usr/libexec/PlistBuddy -c "Set :CODE_SIGN_IDENTITY 'Apple Distribution'" SobAi.xcodeproj/project.pbxproj
+          # Set provisioning profile
+          /usr/libexec/PlistBuddy -c "Set :PROVISIONING_PROFILE 'SobAi Distribution'" SobAi.xcodeproj/project.pbxproj
           cd ..
           
       - name: Build iOS app
         env:
           TEAM_ID: Q834NS68MG
           BUNDLE_ID: com.sobai.app
+          PROVISIONING_PROFILE: SobAi Distribution
         run: |
           cd ios
-          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath SobAi.xcarchive
+          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath SobAi.xcarchive CODE_SIGN_IDENTITY="Apple Distribution" PROVISIONING_PROFILE="SobAi Distribution" DEVELOPMENT_TEAM="Q834NS68MG" PRODUCT_BUNDLE_IDENTIFIER="com.sobai.app"
           xcodebuild -exportArchive -archivePath SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath .
           
       - name: Upload IPA
