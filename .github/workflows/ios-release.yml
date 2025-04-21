@@ -61,21 +61,32 @@ jobs:
           # Set build configuration
           xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -showBuildSettings > build_settings.txt
           
-          # Set team ID and bundle identifier
+          # Update project.pbxproj with signing configuration
           /usr/libexec/PlistBuddy -c "Set :objects:83CBB9F71A601CBA00E9B192:attributes:TargetAttributes:13B07F861A680F5B00A75B9A:DevelopmentTeam 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:PRODUCT_BUNDLE_IDENTIFIER 'com.sobai.app'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:CODE_SIGN_STYLE 'Automatic'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:DEVELOPMENT_TEAM 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:PROVISIONING_PROFILE_SPECIFIER ''" SobAi.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" SobAi.xcodeproj/project.pbxproj
+          
+          # Verify project settings
+          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -showBuildSettings | grep -E "DEVELOPMENT_TEAM|PRODUCT_BUNDLE_IDENTIFIER|CODE_SIGN_STYLE"
           cd ..
           
       - name: Build iOS app
         env:
           TEAM_ID: Q834NS68MG
           BUNDLE_ID: com.sobai.app
+          FASTLANE_TEAM_ID: Q834NS68MG
+          MATCH_KEYCHAIN_NAME: login.keychain
+          MATCH_KEYCHAIN_PASSWORD: ""
         run: |
           cd ios
+          # Clean build folder
+          rm -rf build
+          # Build archive
           xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath SobAi.xcarchive -allowProvisioningUpdates
+          # Export IPA
           xcodebuild -exportArchive -archivePath SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath . -allowProvisioningUpdates
           
       - name: Upload IPA
