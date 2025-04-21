@@ -1,0 +1,41 @@
+name: iOS Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ios/**'
+      - 'app.json'
+      - 'package.json'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          npm install
+          cd ios && pod install && cd ..
+          
+      - name: Build iOS app
+        env:
+          TEAM_ID: Q834NS68MG
+          BUNDLE_ID: com.sobai.app
+        run: |
+          cd ios
+          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath SobAi.xcarchive
+          xcodebuild -exportArchive -archivePath SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath .
+          
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: SobAi.ipa
+          path: ios/SobAi.ipa 
