@@ -110,6 +110,12 @@ jobs:
           cd ios
           # Save the output to a log file
           fastlane release 2>&1 | tee fastlane.log
+          # Check if build was successful
+          if [ $? -eq 0 ]; then
+            echo "Build successful"
+          else
+            echo "Build failed"
+          fi
           cd ..
           
       - name: Upload Build Logs
@@ -119,13 +125,25 @@ jobs:
           path: ios/fastlane.log
           if-no-files-found: error
           
+      - name: Check for IPA file
+        id: check-ipa
+        run: |
+          if [ -f "ios/SobAi.ipa" ]; then
+            echo "ipa_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "ipa_exists=false" >> $GITHUB_OUTPUT
+          fi
+          
       - name: Upload IPA
+        if: steps.check-ipa.outputs.ipa_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: SobAi.ipa
           path: ios/SobAi.ipa
+          if-no-files-found: warn
           
       - name: Create GitHub Release
+        if: steps.check-ipa.outputs.ipa_exists == 'true'
         uses: softprops/action-gh-release@v1
         with:
           files: ios/SobAi.ipa
