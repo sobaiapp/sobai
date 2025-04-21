@@ -23,7 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
-          cd ios && pod install && cd ..
+          cd ios
+          rm -rf Pods
+          rm -rf Podfile.lock
+          pod install --repo-update
+          cd ..
           
       - name: Build iOS app
         env:
