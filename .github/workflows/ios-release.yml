@@ -33,61 +33,57 @@ jobs:
           pod install --repo-update --verbose
           cd ..
           
-      - name: Configure Xcode project
+      - name: Install Fastlane
+        run: |
+          sudo gem install fastlane
+          
+      - name: Configure Fastlane
         run: |
           cd ios
-          # Create export options plist
-          cat > exportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>teamID</key>
-              <string>Q834NS68MG</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>stripSwiftSymbols</key>
-              <true/>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-          </dict>
-          </plist>
+          mkdir -p fastlane
+          cat > fastlane/Fastfile << EOF
+          default_platform(:ios)
+          
+          platform :ios do
+            desc "Build and upload to App Store"
+            lane :release do
+              update_code_signing_settings(
+                use_automatic_signing: true,
+                team_id: "Q834NS68MG",
+                targets: ["SobAi"]
+              )
+              
+              build_ios_app(
+                workspace: "SobAi.xcworkspace",
+                scheme: "SobAi",
+                export_method: "app-store",
+                export_options: {
+                  method: "app-store",
+                  teamID: "Q834NS68MG",
+                  signingStyle: "automatic"
+                }
+              )
+            end
+          end
           EOF
           
-          # Set build configuration
-          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -showBuildSettings > build_settings.txt
-          
-          # Update project.pbxproj with signing configuration
-          /usr/libexec/PlistBuddy -c "Set :objects:83CBB9F71A601CBA00E9B192:attributes:TargetAttributes:13B07F861A680F5B00A75B9A:DevelopmentTeam 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:PRODUCT_BUNDLE_IDENTIFIER 'com.sobai.app'" SobAi.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:CODE_SIGN_STYLE 'Automatic'" SobAi.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:DEVELOPMENT_TEAM 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:PROVISIONING_PROFILE_SPECIFIER ''" SobAi.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" SobAi.xcodeproj/project.pbxproj
-          
-          # Verify project settings
-          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -showBuildSettings | grep -E "DEVELOPMENT_TEAM|PRODUCT_BUNDLE_IDENTIFIER|CODE_SIGN_STYLE"
+          cat > fastlane/Appfile << EOF
+          app_identifier("com.sobai.app")
+          apple_id("your-apple-id@example.com")
+          team_id("Q834NS68MG")
+          EOF
           cd ..
           
-      - name: Build iOS app
+      - name: Build iOS app with Fastlane
         env:
-          TEAM_ID: Q834NS68MG
-          BUNDLE_ID: com.sobai.app
-          FASTLANE_TEAM_ID: Q834NS68MG
-          MATCH_KEYCHAIN_NAME: login.keychain
-          MATCH_KEYCHAIN_PASSWORD: ""
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          # Clean build folder
-          rm -rf build
-          # Build archive
-          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -destination 'generic/platform=iOS' clean archive -archivePath SobAi.xcarchive -allowProvisioningUpdates
-          # Export IPA
-          xcodebuild -exportArchive -archivePath SobAi.xcarchive -exportOptionsPlist exportOptions.plist -exportPath . -allowProvisioningUpdates
+          fastlane release
+          cd ..
           
       - name: Upload IPA
         uses: actions/upload-artifact@v4
