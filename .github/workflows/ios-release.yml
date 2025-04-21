@@ -73,7 +73,7 @@ jobs:
           
           cat > fastlane/Appfile << EOF
           app_identifier("com.sobai.app")
-          apple_id("your-apple-id@example.com")
+          apple_id("${{ secrets.APPLE_ID }}")
           team_id("Q834NS68MG")
           EOF
           cd ..
