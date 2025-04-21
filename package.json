@@ -8,11 +8,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "postinstall": "npx expo install --fix",
-    "prebuild": "expo prebuild",
-    "build:ios": "eas build --platform ios",
-    "build:android": "eas build --platform android",
-    "submit:ios": "eas submit --platform ios",
-    "submit:android": "eas submit --platform android"
+    "prebuild": "expo prebuild"
   },
   "dependencies": {
     "@babel/plugin-transform-async-generator-functions": "^7.26.8",

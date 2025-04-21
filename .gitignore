@@ -56,7 +56,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
+!project.xcworkspace
 *.xcarchive
 
 # Android/IntelliJ
@@ -92,10 +92,6 @@ fastlane/test_output
 
 # credentials
 credentials.json
-
-# Native project folders
-/android
-/ios
 
 # Bundle artifact
 *.jsbundle
