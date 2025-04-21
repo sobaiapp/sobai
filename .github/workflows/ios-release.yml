@@ -26,7 +26,11 @@ jobs:
           cd ios
           rm -rf Pods
           rm -rf Podfile.lock
-          pod install --repo-update
+          rm -rf ~/Library/Caches/CocoaPods
+          pod cache clean --all
+          pod deintegrate
+          pod setup
+          pod install --repo-update --verbose
           cd ..
           
       - name: Build iOS app
