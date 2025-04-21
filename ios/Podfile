@@ -39,7 +39,6 @@ target 'SobAi' do
   pod 'React-RuntimeCore', :path => '../node_modules/react-native/ReactCommon/react/runtime', :inhibit_warnings => true
   pod 'React-RuntimeHermes', :path => '../node_modules/react-native/ReactCommon/react/runtime', :inhibit_warnings => true
   pod 'React-RuntimeApple', :path => '../node_modules/react-native/ReactCommon/react/runtime/platform/ios', :inhibit_warnings => true
-  pod 'React-jsitracing', :path => '../node_modules/react-native/ReactCommon/hermes/executor', :inhibit_warnings => true
 
   use_react_native!(
     :path => config[:reactNativePath],
