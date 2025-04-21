@@ -14,5 +14,10 @@
     <false/>
     <key>uploadSymbols</key>
     <true/>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.sobai.app</key>
+        <string>SobAi Distribution</string>
+    </dict>
 </dict>
 </plist> 
