@@ -62,6 +62,9 @@
     ],
     "owner": "mrposada",
     "description": "SobAi is your personal sober companion, helping you stay on track with your recovery journey through daily motivation, community support, and personalized insights.",
-    "scheme": "sobai"
+    "scheme": "sobai",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    }
   }
 }

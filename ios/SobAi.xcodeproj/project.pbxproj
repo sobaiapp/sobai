@@ -280,32 +280,23 @@
 			baseConfigurationReference = 6C2E3173556A471DD304B334 /* Pods-SobAi.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q834NS68MG;
 				ENABLE_BITCODE = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"FB_SONARKIT_ENABLED=1",
-				);
 				INFOPLIST_FILE = SobAi/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sobai.app;
 				PRODUCT_NAME = SobAi;
+				PROVISIONING_PROFILE_SPECIFIER = "SB_AI_App_Store";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
-				PROVISIONING_PROFILE_SPECIFIER = "SB_AI_App_Store";
-				CODE_SIGN_STYLE = Manual;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
 			};
 			name = Debug;
 		};
@@ -315,26 +306,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q834NS68MG;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = SobAi/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sobai.app;
 				PRODUCT_NAME = SobAi;
+				PROVISIONING_PROFILE_SPECIFIER = "SB_AI_App_Store";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
-				PROVISIONING_PROFILE_SPECIFIER = "SB_AI_App_Store";
-				CODE_SIGN_STYLE = Manual;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
 			};
 			name = Release;
 		};
@@ -391,6 +377,9 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				DEVELOPMENT_TEAM = Q834NS68MG;
+				PROVISIONING_PROFILE_SPECIFIER = "SB_AI_App_Store";
+				CODE_SIGN_STYLE = Manual;
 			};
 			name = Debug;
 		};
@@ -422,7 +411,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -440,6 +429,9 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				DEVELOPMENT_TEAM = Q834NS68MG;
+				PROVISIONING_PROFILE_SPECIFIER = "SB_AI_App_Store";
+				CODE_SIGN_STYLE = Manual;
 			};
 			name = Release;
 		};

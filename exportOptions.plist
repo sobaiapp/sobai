@@ -7,7 +7,12 @@
     <key>teamID</key>
     <string>Q834NS68MG</string>
     <key>signingStyle</key>
-    <string>automatic</string>
+    <string>manual</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.sobai.app</key>
+        <string>SB_AI_App_Store</string>
+    </dict>
     <key>stripSwiftSymbols</key>
     <true/>
     <key>uploadBitcode</key>
