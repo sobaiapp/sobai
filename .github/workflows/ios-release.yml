@@ -47,26 +47,48 @@ jobs:
           platform :ios do
             desc "Build and upload to App Store"
             lane :release do
-              update_code_signing_settings(
-                use_automatic_signing: false,
-                team_id: "Q834NS68MG",
-                targets: ["SobAi"],
-                profile_name: "SB_AI_App_Store",
-                code_sign_identity: "iPhone Distribution"
-              )
-              
-              build_ios_app(
-                workspace: "SobAi.xcworkspace",
-                scheme: "SobAi",
-                export_method: "app-store",
-                export_options: {
-                  method: "app-store",
-                  teamID: "Q834NS68MG",
-                  signingStyle: "manual",
-                  provisioningProfileName: "SB_AI_App_Store",
-                  signingCertificate: "iPhone Distribution"
-                }
-              )
+              begin
+                # Print current directory and list files
+                sh("pwd")
+                sh("ls -la")
+                
+                # Print Xcode version
+                sh("xcodebuild -version")
+                
+                # Print code signing settings
+                sh("security find-identity -v -p codesigning")
+                
+                update_code_signing_settings(
+                  use_automatic_signing: false,
+                  team_id: "Q834NS68MG",
+                  targets: ["SobAi"],
+                  profile_name: "SB_AI_App_Store",
+                  code_sign_identity: "iPhone Distribution"
+                )
+                
+                # Print updated project settings
+                sh("xcodebuild -showBuildSettings -workspace SobAi.xcworkspace -scheme SobAi")
+                
+                build_ios_app(
+                  workspace: "SobAi.xcworkspace",
+                  scheme: "SobAi",
+                  export_method: "app-store",
+                  export_options: {
+                    method: "app-store",
+                    teamID: "Q834NS68MG",
+                    signingStyle: "manual",
+                    provisioningProfileName: "SB_AI_App_Store",
+                    signingCertificate: "iPhone Distribution"
+                  },
+                  clean: true,
+                  output_directory: ".",
+                  output_name: "SobAi.ipa"
+                )
+              rescue => e
+                UI.error("Build failed with error: #{e.message}")
+                UI.error("Backtrace: #{e.backtrace.join("\n")}")
+                raise e
+              end
             end
           end
           EOF
@@ -86,8 +108,16 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          fastlane release
+          # Save the output to a log file
+          fastlane release 2>&1 | tee fastlane.log
           cd ..
+          
+      - name: Upload Build Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: ios/fastlane.log
+          if-no-files-found: error
           
       - name: Upload IPA
         uses: actions/upload-artifact@v4
