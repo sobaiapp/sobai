@@ -36,11 +36,37 @@ jobs:
       - name: Configure Xcode project
         run: |
           cd ios
+          # Create export options plist
+          cat > exportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>Q834NS68MG</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>stripSwiftSymbols</key>
+              <true/>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          
           # Set build configuration
           xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -showBuildSettings > build_settings.txt
+          
           # Set team ID and bundle identifier
           /usr/libexec/PlistBuddy -c "Set :objects:83CBB9F71A601CBA00E9B192:attributes:TargetAttributes:13B07F861A680F5B00A75B9A:DevelopmentTeam 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:PRODUCT_BUNDLE_IDENTIFIER 'com.sobai.app'" SobAi.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:CODE_SIGN_STYLE 'Automatic'" SobAi.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:DEVELOPMENT_TEAM 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:13B07F861A680F5B00A75B9A:buildSettings:PROVISIONING_PROFILE_SPECIFIER ''" SobAi.xcodeproj/project.pbxproj
           cd ..
           
       - name: Build iOS app
