@@ -33,6 +33,17 @@ jobs:
           pod install --repo-update --verbose
           cd ..
           
+      - name: Configure Xcode project
+        run: |
+          cd ios
+          # Set build configuration
+          xcodebuild -workspace SobAi.xcworkspace -scheme SobAi -configuration Release -showBuildSettings > build_settings.txt
+          # Set team ID and bundle identifier
+          /usr/libexec/PlistBuddy -c "Set :PROVISIONING_PROFILE_SPECIFIER 'SobAi Distribution'" SobAi.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :DEVELOPMENT_TEAM 'Q834NS68MG'" SobAi.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :PRODUCT_BUNDLE_IDENTIFIER 'com.sobai.app'" SobAi.xcodeproj/project.pbxproj
+          cd ..
+          
       - name: Build iOS app
         env:
           TEAM_ID: Q834NS68MG
@@ -46,4 +57,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SobAi.ipa
-          path: ios/SobAi.ipa 
+          path: ios/SobAi.ipa
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ios/SobAi.ipa
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
