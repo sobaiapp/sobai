@@ -48,9 +48,11 @@ jobs:
             desc "Build and upload to App Store"
             lane :release do
               update_code_signing_settings(
-                use_automatic_signing: true,
+                use_automatic_signing: false,
                 team_id: "Q834NS68MG",
-                targets: ["SobAi"]
+                targets: ["SobAi"],
+                profile_name: "SB_AI_App_Store",
+                code_sign_identity: "iPhone Distribution"
               )
               
               build_ios_app(
@@ -60,7 +62,9 @@ jobs:
                 export_options: {
                   method: "app-store",
                   teamID: "Q834NS68MG",
-                  signingStyle: "automatic"
+                  signingStyle: "manual",
+                  provisioningProfileName: "SB_AI_App_Store",
+                  signingCertificate: "iPhone Distribution"
                 }
               )
             end
