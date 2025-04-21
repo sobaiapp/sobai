@@ -69,6 +69,9 @@ jobs:
                 # Print updated project settings
                 sh("xcodebuild -showBuildSettings -workspace SobAi.xcworkspace -scheme SobAi")
                 
+                # Clean the build directory
+                sh("rm -rf ~/Library/Developer/Xcode/DerivedData/*")
+                
                 build_ios_app(
                   workspace: "SobAi.xcworkspace",
                   scheme: "SobAi",
@@ -81,12 +84,31 @@ jobs:
                     signingCertificate: "iPhone Distribution"
                   },
                   clean: true,
-                  output_directory: ".",
-                  output_name: "SobAi.ipa"
+                  output_directory: "./",
+                  output_name: "SobAi.ipa",
+                  configuration: "Release",
+                  xcargs: {
+                    PROVISIONING_PROFILE_SPECIFIER: "SB_AI_App_Store",
+                    CODE_SIGN_IDENTITY: "iPhone Distribution"
+                  }
                 )
+                
+                # Verify IPA was created
+                if File.exist?("./SobAi.ipa")
+                  UI.success("IPA file created successfully")
+                  sh("ls -la ./SobAi.ipa")
+                else
+                  UI.error("IPA file was not created")
+                  # List all files in the directory
+                  sh("ls -la ./")
+                  # Check DerivedData directory
+                  sh("ls -la ~/Library/Developer/Xcode/DerivedData/")
+                end
               rescue => e
                 UI.error("Build failed with error: #{e.message}")
                 UI.error("Backtrace: #{e.backtrace.join("\n")}")
+                # List all files in case of failure
+                sh("ls -la ./")
                 raise e
               end
             end
