@@ -170,39 +170,39 @@ const HomeScreen = ({ navigation }) => {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Fade-in animation for the Days Sober Card */}
-        <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
-          <Text style={styles.cardTitle}>Days Clean</Text>
+      {/* Fade-in animation for the Days Sober Card */}
+      <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
+        <Text style={styles.cardTitle}>Days Clean</Text>
           <Text style={styles.counter}>{animatedDays} Days</Text>
-          {startDate ? (
-            <Text style={styles.dateText}>Since: {startDate}</Text>
-          ) : (
-            <Text style={styles.dateText}>Set your start date below.</Text>
-          )}
-          <TouchableOpacity style={styles.button} onPress={showDatePicker}>
-            <Text style={styles.buttonText}>Select Start Date</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        {startDate ? (
+          <Text style={styles.dateText}>Since: {startDate}</Text>
+        ) : (
+          <Text style={styles.dateText}>Set your start date below.</Text>
+        )}
+        <TouchableOpacity style={styles.button} onPress={showDatePicker}>
+          <Text style={styles.buttonText}>Select Start Date</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-        {/* Fade-in for icon buttons */}
-        <Animated.View style={[styles.iconContainer, { opacity: fadeAnim }]}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Meetings')}>
-            <Icon name="calendar-check" size={30} color="dodgerblue" />
-            <Text style={styles.iconText}>Meetings</Text>
-          </TouchableOpacity>
+      {/* Fade-in for icon buttons */}
+      <Animated.View style={[styles.iconContainer, { opacity: fadeAnim }]}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Meetings')}>
+          <Icon name="calendar-check" size={30} color="dodgerblue" />
+          <Text style={styles.iconText}>Meetings</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconButton} onPress={handleCallSponsor}>
-            <Icon name="phone-in-talk" size={30} color="lime" />
-            <Text style={styles.iconText}>Call Sponsor</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={handleCallSponsor}>
+          <Icon name="phone-in-talk" size={30} color="lime" />
+          <Text style={styles.iconText}>Call Sponsor</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('PanicScreen')}>
-            <Icon name="alert" size={30} color="red" />
-            <Text style={styles.iconText}>Panic Button</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('PanicScreen')}>
+          <Icon name="alert" size={30} color="red" />
+          <Text style={styles.iconText}>Panic Button</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-        {/* Progress Card */}
+      {/* Progress Card */}
         <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
           <Text style={styles.cardTitle}>Goal Progress</Text>
           <Text style={styles.progressText}>{Math.floor(progress * 100)}% of 1-Year Goal</Text>
@@ -231,10 +231,10 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </Animated.View>
 
-        {/* Card Container with fade animation */}
-        <Animated.View style={[styles.cardContainer, { opacity: fadeAnim }]}>
-          {/* Check-In Card */}
-          <View style={styles.card2}>
+     {/* Card Container with fade animation */}
+<Animated.View style={[styles.cardContainer, { opacity: fadeAnim }]}>
+  {/* Check-In Card */}
+  <View style={styles.card2}>
             <Text style={styles.card2Title}>Daily Check-In</Text>
             <View style={styles.healthProgressContainer}>
               <CircularProgress
@@ -254,13 +254,13 @@ const HomeScreen = ({ navigation }) => {
                 )}
               </CircularProgress>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CheckIn')}>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CheckIn')}>
               <Text style={styles.buttonText}>Check-In</Text>
-            </TouchableOpacity>
-          </View>
+    </TouchableOpacity>
+  </View>
 
-          {/* Health Card */}
-          <View style={styles.card2}>
+  {/* Health Card */}
+  <View style={styles.card2}>
             <Text style={styles.card2Title}>Health</Text>
             <View style={styles.healthProgressContainer}>
               <CircularProgress
@@ -290,68 +290,68 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.healthStatValue}>20%</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Health')}>
-              <Text style={styles.buttonText}>Track Health</Text>
-            </TouchableOpacity>
-          </View>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Health')}>
+      <Text style={styles.buttonText}>Track Health</Text>
+    </TouchableOpacity>
+  </View>
 
-          {/* Relapse Prevention Plan Card */}
-          <View style={styles.card2}>
-            <Ionicons name="shield-checkmark" size={38} color="#323232" style={styles.cardIcon} />
-            <Text style={styles.cardTitle}>Relapse Prevention Plan</Text>
-            <Text style={styles.relapseText}>Review your personalized relapse prevention strategies.</Text>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RelapsePrevention')}>
-              <Text style={styles.buttonText}>View Plan</Text>
-            </TouchableOpacity>
-          </View>
+  {/* Relapse Prevention Plan Card */}
+  <View style={styles.card2}>
+    <Ionicons name="shield-checkmark" size={38} color="#323232" style={styles.cardIcon} />
+    <Text style={styles.cardTitle}>Relapse Prevention Plan</Text>
+    <Text style={styles.relapseText}>Review your personalized relapse prevention strategies.</Text>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RelapsePrevention')}>
+      <Text style={styles.buttonText}>View Plan</Text>
+    </TouchableOpacity>
+  </View>
 
-          {/* Challenges & Goals Card */}
-          <View style={styles.card2}>
-            <Ionicons name="trophy" size={38} color="#323232" style={styles.cardIcon} />
-            <Text style={styles.cardTitle}>Challenges & Goals</Text>
-            <Text style={styles.challengeText}>New Challenge: 7 Days Without Sugar!</Text>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Challenges')}>
+  {/* Challenges & Goals Card */}
+  <View style={styles.card2}>
+    <Ionicons name="trophy" size={38} color="#323232" style={styles.cardIcon} />
+    <Text style={styles.cardTitle}>Challenges & Goals</Text>
+    <Text style={styles.challengeText}>New Challenge: 7 Days Without Sugar!</Text>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Challenges')}>
               <Text style={styles.buttonText}>Start Now</Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
+    </TouchableOpacity>
+  </View>
+</Animated.View>
 
-        {/* Date Picker Modal */}
-        {showPicker && (
-          <Modal transparent={true} animationType="slide" visible={showPicker} onRequestClose={() => setShowPicker(false)}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <DateTimePicker value={selectedDate} mode="date" display="spinner" onChange={onDateChange} maximumDate={new Date()} />
-                <TouchableOpacity style={styles.doneButton} onPress={confirmDate}>
-                  <Text style={styles.doneButtonText}>Done</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-        )}
-
-        {/* Phone Number Modal */}
-        <Modal transparent={true} animationType="slide" visible={showPhoneModal} onRequestClose={() => setShowPhoneModal(false)}>
+      {/* Date Picker Modal */}
+      {showPicker && (
+        <Modal transparent={true} animationType="slide" visible={showPicker} onRequestClose={() => setShowPicker(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Enter Sponsor's Phone Number</Text>
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="Enter phone number"
-                keyboardType="phone-pad"
-                value={sponsorPhone}
-                onChangeText={setSponsorPhone}
-              />
-              <TouchableOpacity style={styles.saveButton} onPress={saveSponsorPhone}>
-                <Text style={styles.saveButtonText}>Save & Call</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setShowPhoneModal(false)}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+              <DateTimePicker value={selectedDate} mode="date" display="spinner" onChange={onDateChange} maximumDate={new Date()} />
+              <TouchableOpacity style={styles.doneButton} onPress={confirmDate}>
+                <Text style={styles.doneButtonText}>Done</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
-      </ScrollView>
+      )}
+
+      {/* Phone Number Modal */}
+      <Modal transparent={true} animationType="slide" visible={showPhoneModal} onRequestClose={() => setShowPhoneModal(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Enter Sponsor's Phone Number</Text>
+            <TextInput
+              style={styles.phoneInput}
+              placeholder="Enter phone number"
+              keyboardType="phone-pad"
+              value={sponsorPhone}
+              onChangeText={setSponsorPhone}
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={saveSponsorPhone}>
+              <Text style={styles.saveButtonText}>Save & Call</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowPhoneModal(false)}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
     </LinearGradient>
   );
 };

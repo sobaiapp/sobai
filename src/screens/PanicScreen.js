@@ -344,12 +344,12 @@ const PanicScreen = () => {
                 )}
               </View>
               {!isEditing && contact.number && (
-                <TouchableOpacity
+            <TouchableOpacity 
                   style={styles.callButton}
                   onPress={() => makeCall(contact.number)}
-                >
+            >
                   <Ionicons name="call" size={24} color="#fff" />
-                </TouchableOpacity>
+            </TouchableOpacity>
               )}
             </View>
           ))}

@@ -97,15 +97,15 @@ const RegisterScreen = () => {
         style={styles.keyboardAvoid}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.header}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color="#000" />
-            </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
             <Text style={styles.title}>Create Account</Text>
-          </View>
+      </View>
 
           <View style={styles.formContainer}>
             <TextInput
@@ -138,17 +138,17 @@ const RegisterScreen = () => {
               secureTextEntry
             />
 
-            <TouchableOpacity
+        <TouchableOpacity
               style={styles.registerButton}
               onPress={handleRegister}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
+          disabled={loading}
+        >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
                 <Text style={styles.registerButtonText}>Create Account</Text>
-              )}
-            </TouchableOpacity>
+            )}
+        </TouchableOpacity>
 
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Already have an account? </Text>
@@ -162,7 +162,7 @@ const RegisterScreen = () => {
             <View style={styles.line} />
             <Text style={styles.dividerText}>or</Text>
             <View style={styles.line} />
-          </View>
+      </View>
 
           <SignUpWithApple />
 
@@ -170,8 +170,8 @@ const RegisterScreen = () => {
             <Text style={styles.footerText}>Already have an account?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={styles.footerLink}>Sign In</Text>
-            </TouchableOpacity>
-          </View>
+        </TouchableOpacity>
+      </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
