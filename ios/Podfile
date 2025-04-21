@@ -39,6 +39,7 @@ target 'SobAi' do
   pod 'React-RuntimeCore', :path => '../node_modules/react-native/ReactCommon/react/runtime', :inhibit_warnings => true
   pod 'React-RuntimeHermes', :path => '../node_modules/react-native/ReactCommon/react/runtime', :inhibit_warnings => true
   pod 'React-RuntimeApple', :path => '../node_modules/react-native/ReactCommon/react/runtime/platform/ios', :inhibit_warnings => true
+  pod 'React-jsitracing', :path => '../node_modules/react-native/ReactCommon/hermes/executor', :inhibit_warnings => true
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -74,6 +75,11 @@ target 'SobAi' do
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
         config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
         config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RCT_NEW_ARCH_ENABLED=1'
+        if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+          target.build_configurations.each do |config|
+            config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+          end
+        end
       end
     end
   end
