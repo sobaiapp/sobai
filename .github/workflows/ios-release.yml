@@ -121,7 +121,7 @@ jobs:
       - name: Upload Build Logs
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
+          name: ios-build-logs
           path: ios/fastlane.log
           if-no-files-found: error
           
@@ -130,15 +130,19 @@ jobs:
         run: |
           if [ -f "ios/SobAi.ipa" ]; then
             echo "ipa_exists=true" >> $GITHUB_OUTPUT
+            echo "Found IPA file at ios/SobAi.ipa"
+            ls -la ios/
           else
             echo "ipa_exists=false" >> $GITHUB_OUTPUT
+            echo "No IPA file found in ios directory"
+            ls -la ios/
           fi
           
       - name: Upload IPA
         if: steps.check-ipa.outputs.ipa_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: SobAi.ipa
+          name: ios-build-artifacts
           path: ios/SobAi.ipa
           if-no-files-found: warn
           
