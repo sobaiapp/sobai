@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sobai.app",
@@ -20,7 +22,9 @@
         "NSLocationAlwaysUsageDescription": "We need your location to find NA and AA meetings near you.",
         "NSCameraUsageDescription": "We need access to your camera to allow you to take profile pictures.",
         "NSPhotoLibraryUsageDescription": "We need access to your photo library to allow you to select profile pictures.",
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -47,22 +51,16 @@
           "locationAlwaysAndWhenInUsePermission": "Allow SobAi to use your location to find NA and AA meetings near you."
         }
       ],
-      "expo-router",
       [
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
           "color": "#ffffff"
         }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "Allow SobAi to access your photos so you can upload profile pictures."
-        }
-      ],
-      "expo-camera"
+      ]
     ],
+    "owner": "mrposada",
+    "description": "SobAi is your personal sober companion, helping you stay on track with your recovery journey through daily motivation, community support, and personalized insights.",
     "updates": {
       "url": "https://u.expo.dev/3fcbfd7c-ba9a-4941-b4b5-bfad41e53a42"
     },
@@ -70,14 +68,10 @@
       "policy": "sdkVersion"
     },
     "extra": {
-      "router": {
-        "origin": false
-      },
       "eas": {
         "projectId": "3fcbfd7c-ba9a-4941-b4b5-bfad41e53a42"
       }
     },
-    "owner": "mrposada",
-    "description": "SobAi is your personal sober companion, helping you stay on track with your recovery journey through daily motivation, community support, and personalized insights."
+    "scheme": "sobai"
   }
 }
