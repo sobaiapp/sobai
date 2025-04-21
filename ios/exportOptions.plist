@@ -17,7 +17,7 @@
     <key>provisioningProfiles</key>
     <dict>
         <key>com.sobai.app</key>
-        <string>SobAi Distribution</string>
+        <string>SB_AI_App_Store</string>
     </dict>
 </dict>
 </plist> 
