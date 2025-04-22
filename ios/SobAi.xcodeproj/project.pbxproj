@@ -166,6 +166,12 @@
 						DevelopmentTeam = "Q834NS68MG";
 						LastSwiftMigration = 1250;
 						ProvisioningStyle = Automatic;
+						DevelopmentTeamName = "SobAi";
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};

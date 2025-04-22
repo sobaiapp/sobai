@@ -20,7 +20,8 @@ platform :ios do
       use_automatic_signing: true,
       team_id: ENV["APPLE_TEAM_ID"],
       targets: ["SobAi"],
-      build_configurations: ["Release"]
+      build_configurations: ["Release"],
+      path: "SobAi.xcodeproj"
     )
     
     # Build the app
@@ -36,6 +37,10 @@ platform :ios do
         method: "app-store",
         signingStyle: "automatic",
         teamID: ENV["APPLE_TEAM_ID"]
+      },
+      xcargs: {
+        "PROVISIONING_PROFILE_SPECIFIER": "",
+        "CODE_SIGN_STYLE": "Automatic"
       }
     )
     
