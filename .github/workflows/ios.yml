@@ -27,29 +27,35 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
-    - name: Install dependencies
-      run: npm install
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
     
-    - name: Install CocoaPods
+    - name: Install dependencies
       run: |
+        npm install
         cd ios
+        bundle install
         pod install
+        cd ..
     
     - name: Install Provisioning Profile
       env:
         PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
       run: |
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI_App_Store.mobileprovision
+        echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision
     
     - name: Build iOS app
       env:
         APPLE_TEAM_ID: Q834NS68MG
-        PROVISIONING_PROFILE_SPECIFIER: SB_AI_App_Store
+        PROVISIONING_PROFILE_SPECIFIER: SB_AI
         CODE_SIGN_IDENTITY: iPhone Distribution
       run: |
         cd ios
-        fastlane build
+        bundle exec fastlane build
     
     - name: Upload IPA
       uses: actions/upload-artifact@v4
