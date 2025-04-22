@@ -1,21 +1,23 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Build iOS app for App Store distribution"
+  desc "Push a new beta build to TestFlight"
   lane :build do
     # Create a temporary keychain
     create_keychain(
       name: "temp_keychain",
-      password: "password",
+      password: "temp_password",
       default_keychain: true,
       unlock: true,
-      timeout: 3600
+      timeout: 3600,
+      add_to_search_list: true
     )
 
     # Update code signing settings to use automatic signing
     update_code_signing_settings(
       use_automatic_signing: true,
-      team_id: "Q834NS68MG"
+      team_id: "Q834NS68MG",
+      path: "SobAi.xcodeproj"
     )
 
     # Build the app with automatic signing
@@ -23,11 +25,8 @@ platform :ios do
       scheme: "SobAi",
       export_method: "app-store",
       export_options: {
-        method: "app-store",
         signingStyle: "automatic"
-      },
-      output_directory: "./build",
-      output_name: "SobAi.ipa"
+      }
     )
 
     # Clean up the keychain
