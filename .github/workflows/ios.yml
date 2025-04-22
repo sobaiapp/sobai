@@ -19,27 +19,20 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
     
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
-    
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
     
     - name: Install dependencies
+      run: npm install
+    
+    - name: Install CocoaPods
       run: |
-        npm install
         cd ios
-        bundle install
         pod install
-        cd ..
     
     - name: Install Provisioning Profile
       env:
@@ -48,17 +41,17 @@ jobs:
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI_App_Store.mobileprovision
     
-    - name: Run Fastlane
+    - name: Build iOS app
       env:
         APPLE_TEAM_ID: Q834NS68MG
-        FASTLANE_SKIP_UPDATE_CHECK: true
+        PROVISIONING_PROFILE_SPECIFIER: SB_AI_App_Store
+        CODE_SIGN_IDENTITY: iPhone Distribution
       run: |
         cd ios
-        bundle exec fastlane build
+        fastlane build
     
     - name: Upload IPA
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: SobAi.ipa
-        path: ios/build/SobAi.ipa
-        retention-days: 5 
+        path: ios/SobAi.ipa 

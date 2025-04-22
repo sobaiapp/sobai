@@ -9,19 +9,16 @@ platform :ios do
       password: "temp_password",
       default_keychain: true,
       unlock: true,
-      timeout: 3600,
-      add_to_search_list: true
+      timeout: 3600
     )
 
-    # Update code signing settings to use manual signing
+    # Update code signing settings
     update_code_signing_settings(
       use_automatic_signing: false,
       team_id: "Q834NS68MG",
-      path: "SobAi.xcodeproj",
-      targets: ["SobAi"],
-      build_configurations: ["Debug", "Release"],
       code_sign_identity: "iPhone Distribution",
-      profile_name: "SB_AI_App_Store"
+      profile_name: "SB_AI_App_Store",
+      build_configuration: "Release"
     )
 
     # Build the app with manual signing
@@ -29,21 +26,20 @@ platform :ios do
       scheme: "SobAi",
       export_method: "app-store",
       export_options: {
-        signingStyle: "manual",
-        teamID: "Q834NS68MG",
         provisioningProfiles: {
           "com.sobai.app" => "SB_AI_App_Store"
-        }
+        },
+        signingStyle: "manual",
+        teamID: "Q834NS68MG"
       },
       xcargs: {
+        PROVISIONING_PROFILE_SPECIFIER: "SB_AI_App_Store",
         CODE_SIGN_IDENTITY: "iPhone Distribution",
-        CODE_SIGN_STYLE: "Manual",
-        DEVELOPMENT_TEAM: "Q834NS68MG",
-        PROVISIONING_PROFILE_SPECIFIER: "SB_AI_App_Store"
+        DEVELOPMENT_TEAM: "Q834NS68MG"
       }
     )
 
-    # Clean up the keychain
+    # Clean up the temporary keychain
     delete_keychain(name: "temp_keychain")
   end
 end 
