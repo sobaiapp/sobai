@@ -33,6 +33,14 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to find NA and AA meetings near you.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location to find NA and AA meetings near you.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to allow you to take profile pictures.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to allow you to select profile pictures.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

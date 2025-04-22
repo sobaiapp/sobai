@@ -13,6 +13,8 @@
         <key>com.sobai.app</key>
         <string>SB_AI_App_Store</string>
     </dict>
+    <key>signingCertificate</key>
+    <string>iPhone Distribution</string>
     <key>stripSwiftSymbols</key>
     <true/>
     <key>uploadBitcode</key>
