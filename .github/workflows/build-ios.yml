@@ -36,25 +36,33 @@ jobs:
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         PROVISIONING_PROFILE_SPECIFIER: SB_AI_App_Store
+        CODE_SIGN_IDENTITY: iPhone Distribution
       run: |
         cd ios
+        # Clean the build folder
+        rm -rf build
+        mkdir -p build
+        
+        # Build the archive
         xcodebuild -workspace SobAi.xcworkspace \
           -scheme SobAi \
           -configuration Release \
           -destination 'generic/platform=iOS' \
           clean archive \
-          -archivePath SobAi.xcarchive \
-          CODE_SIGN_IDENTITY="iPhone Distribution" \
+          -archivePath build/SobAi.xcarchive \
+          CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
           PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER" \
-          DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
+          DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+          CODE_SIGN_STYLE=Manual
         
+        # Export the IPA
         xcodebuild -exportArchive \
-          -archivePath SobAi.xcarchive \
+          -archivePath build/SobAi.xcarchive \
           -exportOptionsPlist ../exportOptions.plist \
-          -exportPath .
+          -exportPath build
     
     - name: Upload IPA artifact
       uses: actions/upload-artifact@v3
       with:
         name: SobAi.ipa
-        path: ios/SobAi.ipa 
+        path: ios/build/SobAi.ipa 
