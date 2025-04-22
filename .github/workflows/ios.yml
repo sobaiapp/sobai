@@ -1,7 +1,7 @@
 name: iOS Build
 
 on:
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -16,23 +16,23 @@ jobs:
   build:
     name: Build iOS App
     runs-on: macos-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
-    
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
         bundler-cache: true
-    
+
     - name: Install dependencies
       run: |
         npm install
@@ -40,47 +40,28 @@ jobs:
         bundle install
         pod install
         cd ..
-    
-    - name: Install Provisioning Profile
+
+    - name: Configure match for signing
       env:
-        PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
-      run: |
-        # Create the directory if it doesn't exist
-        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        
-        # Decode and save the profile
-        echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision
-        
-        # Set correct permissions
-        chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision
-        
-        # Verify the profile was installed
-        echo "Listing provisioning profiles:"
-        ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
-        
-        echo "Checking profile details:"
-        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision
-        
-        # Verify Xcode can see the profile
-        echo "Checking Xcode profile visibility:"
-        /usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< $(security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision)
-        
-        # Restart Xcode services to ensure it picks up the new profile
-        killall Xcode || true
-        xcodebuild -version
-    
-    - name: Build iOS app
-      env:
-        APPLE_TEAM_ID: Q834NS68MG
-        PROVISIONING_PROFILE_SPECIFIER: SB_AI
-        CODE_SIGN_IDENTITY: iPhone Distribution
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        FASTLANE_USER: ${{ secrets.APPLE_ID }}
+        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
       run: |
         cd ios
-        bundle exec fastlane build
-    
-    - name: Upload IPA
+        bundle exec fastlane match appstore --readonly
+
+    - name: Build and upload to TestFlight
+      env:
+        FASTLANE_USER: ${{ secrets.APPLE_ID }}
+        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+      run: |
+        cd ios
+        bundle exec fastlane beta
+
+    - name: Upload IPA artifact
       uses: actions/upload-artifact@v4
       with:
         name: SobAi.ipa
         path: ios/SobAi.ipa
-        retention-days: 5 
+        retention-days: 5
