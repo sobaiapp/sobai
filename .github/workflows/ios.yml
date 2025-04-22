@@ -36,6 +36,13 @@ jobs:
       run: |
         sudo gem install fastlane -NV
     
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+    
     - name: Build iOS app
       env:
         APPLE_ID: ${{ secrets.APPLE_ID }}
