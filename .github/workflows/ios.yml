@@ -1,0 +1,68 @@
+name: iOS Build
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+  push:
+    branches: [ main ]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'app.json'
+      - 'package.json'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Install CocoaPods
+      run: |
+        cd ios
+        pod install
+        cd ..
+    
+    - name: Build iOS app
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        PROVISIONING_PROFILE_SPECIFIER: SB_AI_App_Store
+        CODE_SIGN_IDENTITY: iPhone Distribution
+      run: |
+        cd ios
+        # Clean the build folder
+        rm -rf build
+        mkdir -p build
+        
+        # Build the archive
+        xcodebuild -workspace SobAi.xcworkspace \
+          -scheme SobAi \
+          -configuration Release \
+          -destination 'generic/platform=iOS' \
+          clean archive \
+          -archivePath build/SobAi.xcarchive \
+          CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
+          PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER" \
+          DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+          CODE_SIGN_STYLE=Manual
+        
+        # Export the IPA
+        xcodebuild -exportArchive \
+          -archivePath build/SobAi.xcarchive \
+          -exportOptionsPlist ../exportOptions.plist \
+          -exportPath build
+    
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: SobAi.ipa
+        path: ios/build/SobAi.ipa 
