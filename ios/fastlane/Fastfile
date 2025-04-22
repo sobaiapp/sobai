@@ -17,12 +17,10 @@ platform :ios do
     
     # Update code signing settings
     update_code_signing_settings(
-      use_automatic_signing: false,
+      use_automatic_signing: true,
       team_id: ENV["APPLE_TEAM_ID"],
       targets: ["SobAi"],
-      build_configurations: ["Release"],
-      code_sign_identity: "iPhone Distribution",
-      profile_name: "SB_AI_App_Store"
+      build_configurations: ["Release"]
     )
     
     # Build the app
@@ -36,16 +34,8 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        provisioningProfiles: { 
-          "com.sobai.app" => "SB_AI_App_Store"
-        },
-        signingStyle: "manual",
+        signingStyle: "automatic",
         teamID: ENV["APPLE_TEAM_ID"]
-      },
-      xcargs: {
-        DEVELOPMENT_TEAM: ENV["APPLE_TEAM_ID"],
-        PROVISIONING_PROFILE_SPECIFIER: "SB_AI_App_Store",
-        CODE_SIGN_IDENTITY: "iPhone Distribution"
       }
     )
     
