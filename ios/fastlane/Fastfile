@@ -12,21 +12,19 @@ platform :ios do
       timeout: 3600
     )
 
-    # Update code signing settings
+    # Update code signing settings to use automatic signing
     update_code_signing_settings(
       use_automatic_signing: true,
       team_id: "Q834NS68MG"
     )
 
-    # Build the app
+    # Build the app with automatic signing
     build_ios_app(
       scheme: "SobAi",
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        provisioningProfiles: {
-          "com.sobai.app" => "SB_AI_App_Store"
-        }
+        signingStyle: "automatic"
       }
     )
 
