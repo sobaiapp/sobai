@@ -3,53 +3,39 @@ default_platform(:ios)
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    setup_ci
-    
-    # Create temporary keychain
+    # Create a temporary keychain
     create_keychain(
-      name: "fastlane_tmp_keychain",
+      name: "temp_keychain",
       password: "password",
       default_keychain: true,
       unlock: true,
-      timeout: 3600,
-      lock_when_sleeps: false
+      timeout: 3600
     )
-    
+
     # Update code signing settings
     update_code_signing_settings(
       use_automatic_signing: true,
-      team_id: ENV["APPLE_TEAM_ID"],
-      targets: ["SobAi"],
-      build_configurations: ["Release"],
-      path: "SobAi.xcodeproj"
+      team_id: "Q834NS68MG"
     )
-    
+
     # Build the app
     build_ios_app(
-      workspace: "SobAi.xcworkspace",
       scheme: "SobAi",
-      configuration: "Release",
-      clean: true,
-      output_directory: "build",
-      output_name: "SobAi.ipa",
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        signingStyle: "automatic",
-        teamID: ENV["APPLE_TEAM_ID"]
-      },
-      xcargs: {
-        "PROVISIONING_PROFILE_SPECIFIER": "",
-        "CODE_SIGN_STYLE": "Automatic"
+        provisioningProfiles: {
+          "com.sobai.app" => "SB_AI_App_Store"
+        }
       }
     )
-    
+
     # Upload to TestFlight
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )
-    
-    # Clean up keychain
-    delete_keychain(name: "fastlane_tmp_keychain")
+
+    # Clean up the keychain
+    delete_keychain(name: "temp_keychain")
   end
 end 

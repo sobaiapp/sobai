@@ -3,7 +3,8 @@ name: iOS Build
 on:
   workflow_dispatch:  # Allows manual triggering
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'ios/**'
       - 'src/**'
@@ -15,38 +16,31 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
     
     - name: Install dependencies
-      run: npm install
-    
-    - name: Install CocoaPods
       run: |
-        cd ios
-        pod install
-        cd ..
+        npm install
+        cd ios && pod install && cd ..
     
-    - name: Install fastlane
+    - name: Install Fastlane
       run: |
-        sudo gem install fastlane -NV
+        sudo gem install fastlane
     
-    - name: Build iOS app
+    - name: Run Fastlane
       env:
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        APPLE_TEAM_ID: Q834NS68MG
       run: |
         cd ios
         fastlane beta
     
-    - name: Upload IPA artifact
-      uses: actions/upload-artifact@v4
+    - name: Upload IPA
+      uses: actions/upload-artifact@v3
       with:
         name: SobAi.ipa
         path: ios/build/SobAi.ipa 
