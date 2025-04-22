@@ -2,7 +2,7 @@ default_platform(:ios)
 
 platform :ios do
   desc "Build iOS app for App Store using manual code signing"
-  lane :build do
+  lane :beta do
     keychain_name = "temp_keychain"
     keychain_password = "temp_password"
 
@@ -23,7 +23,7 @@ platform :ios do
     # Update code signing settings manually
     update_code_signing_settings(
       use_automatic_signing: false,
-      team_id: "Q834NS68MG",
+      team_id: ENV["FASTLANE_TEAM_ID"],
       path: "./SobAi.xcodeproj",
       targets: ["SobAi"],
       build_configurations: ["Release"],
@@ -42,9 +42,14 @@ platform :ios do
           "com.sobai.app" => "SB_AI"
         },
         signingStyle: "manual",
-        teamID: "Q834NS68MG"
+        teamID: ENV["FASTLANE_TEAM_ID"]
       },
-      xcargs: "PROVISIONING_PROFILE_SPECIFIER=SB_AI CODE_SIGN_IDENTITY='iPhone Distribution' DEVELOPMENT_TEAM=Q834NS68MG"
+      xcargs: "PROVISIONING_PROFILE_SPECIFIER=SB_AI CODE_SIGN_IDENTITY='iPhone Distribution' DEVELOPMENT_TEAM=#{ENV['FASTLANE_TEAM_ID']}"
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
     )
 
     # Delete the temporary keychain
