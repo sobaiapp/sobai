@@ -12,6 +12,9 @@ platform :ios do
       timeout: 3600
     )
 
+    # Get the profile UUID
+    profile_uuid = sh("security cms -D -i ~/Library/MobileDevice/Provisioning\\ Profiles/SB_AI.mobileprovision | /usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin").strip
+
     # Update code signing settings
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -21,7 +24,7 @@ platform :ios do
       build_configurations: ["Release"],
       code_sign_identity: "iPhone Distribution",
       profile_name: "SB_AI",
-      profile_uuid: "SB_AI"
+      profile_uuid: profile_uuid
     )
 
     # Build the app with manual signing

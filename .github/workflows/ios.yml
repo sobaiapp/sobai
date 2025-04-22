@@ -55,8 +55,19 @@ jobs:
         chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision
         
         # Verify the profile was installed
+        echo "Listing provisioning profiles:"
         ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+        
+        echo "Checking profile details:"
         security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision
+        
+        # Verify Xcode can see the profile
+        echo "Checking Xcode profile visibility:"
+        /usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< $(security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI.mobileprovision)
+        
+        # Restart Xcode services to ensure it picks up the new profile
+        killall Xcode || true
+        xcodebuild -version
     
     - name: Build iOS app
       env:
