@@ -16,15 +16,17 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: false,
       team_id: "Q834NS68MG",
-      path: "SobAi.xcodeproj",
+      path: "./SobAi.xcodeproj",
       targets: ["SobAi"],
       build_configurations: ["Release"],
       code_sign_identity: "iPhone Distribution",
-      profile_name: "SB_AI"
+      profile_name: "SB_AI",
+      profile_uuid: "SB_AI"
     )
 
     # Build the app with manual signing
     build_ios_app(
+      workspace: "./SobAi.xcworkspace",
       scheme: "SobAi",
       export_method: "app-store",
       export_options: {
