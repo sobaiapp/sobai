@@ -41,13 +41,6 @@ jobs:
         pod install
         cd ..
     
-    - name: Install Provisioning Profile
-      env:
-        PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
-      run: |
-        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/SB_AI_App_Store.mobileprovision
-    
     - name: Run Fastlane
       env:
         APPLE_TEAM_ID: Q834NS68MG

@@ -34,7 +34,8 @@ platform :ios do
       xcargs: {
         CODE_SIGN_IDENTITY: "Apple Development",
         CODE_SIGN_STYLE: "Automatic",
-        DEVELOPMENT_TEAM: "Q834NS68MG"
+        DEVELOPMENT_TEAM: "Q834NS68MG",
+        PROVISIONING_PROFILE_SPECIFIER: "Automatic"
       }
     )
 
