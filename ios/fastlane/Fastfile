@@ -15,14 +15,6 @@ platform :ios do
       lock_when_sleeps: false
     )
     
-    # Import certificates
-    match(
-      type: "appstore",
-      readonly: true,
-      keychain_name: "fastlane_tmp_keychain",
-      keychain_password: "password"
-    )
-    
     # Update code signing settings
     update_code_signing_settings(
       use_automatic_signing: false,
@@ -30,8 +22,7 @@ platform :ios do
       targets: ["SobAi"],
       build_configurations: ["Release"],
       code_sign_identity: "iPhone Distribution",
-      profile_name: "SB_AI_App_Store",
-      profile_uuid: ENV["PROVISIONING_PROFILE_UUID"]
+      profile_name: "SB_AI_App_Store"
     )
     
     # Build the app
