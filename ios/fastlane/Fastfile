@@ -1,0 +1,31 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    setup_ci
+    
+    # Update code signing settings
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      team_id: ENV["APPLE_TEAM_ID"]
+    )
+    
+    # Build the app
+    build_ios_app(
+      workspace: "SobAi.xcworkspace",
+      scheme: "SobAi",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: { 
+          "com.sobai.app" => "SB_AI_App_Store"
+        }
+      }
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+end 

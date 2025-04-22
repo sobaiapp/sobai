@@ -1,0 +1,6 @@
+git_url("https://github.com/sobaiapp/ios-certificates.git")
+storage_mode("git")
+type("appstore")
+app_identifier(["com.sobai.app"])
+username(ENV["APPLE_ID"])
+team_id(ENV["APPLE_TEAM_ID"]) 
