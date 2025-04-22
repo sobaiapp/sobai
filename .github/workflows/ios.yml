@@ -27,14 +27,19 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+    
     - name: Install dependencies
       run: |
         npm install
-        cd ios && pod install && cd ..
-    
-    - name: Install Fastlane
-      run: |
-        sudo gem install fastlane -NV
+        cd ios
+        bundle install
+        pod install
+        cd ..
     
     - name: Install Provisioning Profile
       env:
@@ -46,9 +51,10 @@ jobs:
     - name: Run Fastlane
       env:
         APPLE_TEAM_ID: Q834NS68MG
+        FASTLANE_SKIP_UPDATE_CHECK: true
       run: |
         cd ios
-        fastlane build
+        bundle exec fastlane build
     
     - name: Upload IPA
       uses: actions/upload-artifact@v4
