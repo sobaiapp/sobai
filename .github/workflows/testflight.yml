@@ -1,0 +1,59 @@
+name: TestFlight Build
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+  push:
+    branches: [ main ]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'app.json'
+      - 'package.json'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Install CocoaPods
+      run: |
+        cd ios
+        pod install
+        cd ..
+    
+    - name: Build iOS app
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        PROVISIONING_PROFILE_SPECIFIER: SB_AI_App_Store
+      run: |
+        cd ios
+        xcodebuild -workspace SobAi.xcworkspace \
+          -scheme SobAi \
+          -configuration Release \
+          -destination 'generic/platform=iOS' \
+          clean archive \
+          -archivePath SobAi.xcarchive \
+          CODE_SIGN_IDENTITY="iPhone Distribution" \
+          PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER" \
+          DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
+        
+        xcodebuild -exportArchive \
+          -archivePath SobAi.xcarchive \
+          -exportOptionsPlist ../exportOptions.plist \
+          -exportPath .
+    
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: SobAi.ipa
+        path: ios/SobAi.ipa 
