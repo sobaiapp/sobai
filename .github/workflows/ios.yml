@@ -34,9 +34,9 @@ jobs:
     
     - name: Build iOS app
       env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        PROVISIONING_PROFILE_SPECIFIER: SB_AI_App_Store
-        CODE_SIGN_IDENTITY: iPhone Distribution
       run: |
         cd ios
         # Clean the build folder
@@ -50,10 +50,8 @@ jobs:
           -destination 'generic/platform=iOS' \
           clean archive \
           -archivePath build/SobAi.xcarchive \
-          CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
-          PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER" \
           DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-          CODE_SIGN_STYLE=Manual
+          CODE_SIGN_STYLE=Automatic
         
         # Export the IPA
         xcodebuild -exportArchive \
