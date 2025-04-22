@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'expo-linear-gradient';
+import { useAuth } from '../context/AuthContext';
 
 // Import screens
 import StartScreen from '../screens/StartScreen';
@@ -154,6 +155,8 @@ const styles = StyleSheet.create({
 
 const Navigation = () => {
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+  const navigationRef = useRef();
+  const { setNavigationRef } = useAuth();
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -162,6 +165,12 @@ const Navigation = () => {
     };
     checkOnboarding();
   }, []);
+
+  useEffect(() => {
+    if (navigationRef.current) {
+      setNavigationRef(navigationRef.current);
+    }
+  }, [navigationRef.current]);
 
   if (isFirstLaunch === null) {
     return (
@@ -172,7 +181,7 @@ const Navigation = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <View style={styles.mainContainer}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {isFirstLaunch ? (

@@ -1,4 +1,5 @@
 import { Client, Account, Databases, Storage, ID, Query, Permission, Role } from 'react-native-appwrite';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Initialize Appwrite client with hardcoded values (can replace with .env later)
 const client = new Client();
@@ -144,6 +145,23 @@ export const createUser = async (email, password, name) => {
  */
 export const loginUser = async (email, password) => {
   try {
+    // Clear all cached data before login
+    try {
+      await AsyncStorage.multiRemove([
+        'user',
+        'profile',
+        'session',
+        'friends',
+        'milestones',
+        'messages',
+        'stats',
+        'achievements',
+        'posts'
+      ]);
+    } catch (error) {
+      console.log('Error clearing cached data before login:', error);
+    }
+
     // First, try to delete any existing sessions
     try {
       const sessions = await account.listSessions();
@@ -202,9 +220,27 @@ export const logoutUser = async () => {
         }
       }
     } catch (error) {
-      console.log('Failed to list sessions');
+      console.log('No sessions to delete');
+    }
+
+    // Clear all cached data from AsyncStorage
+    try {
+      await AsyncStorage.multiRemove([
+        'user',
+        'profile',
+        'session',
+        'friends',
+        'milestones',
+        'messages',
+        'stats',
+        'achievements',
+        'posts'
+      ]);
+    } catch (error) {
+      console.log('Error clearing AsyncStorage:', error);
     }
   } catch (error) {
+    console.error('Logout error:', error);
     throw formatAppwriteError(error);
   }
 };

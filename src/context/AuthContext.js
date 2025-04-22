@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { account, databases } from '../services/appwrite';
-import { getUserProfile, loginUser, verifySession } from '../services/appwrite';
+import { getUserProfile, loginUser, verifySession, logoutUser } from '../services/appwrite';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CommonActions } from '@react-navigation/native';
 
 const AuthContext = createContext();
 
@@ -17,6 +19,36 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [navigation, setNavigation] = useState(null);
+
+  const setNavigationRef = (nav) => {
+    setNavigation(nav);
+  };
+
+  const clearAllData = async () => {
+    try {
+      // Clear AsyncStorage
+      const keys = await AsyncStorage.getAllKeys();
+      await AsyncStorage.multiRemove(keys);
+      
+      // Clear React state
+      setUser(null);
+      setProfile(null);
+      setError(null);
+      
+      // Clear navigation state
+      if (navigation) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Start' }],
+          })
+        );
+      }
+    } catch (error) {
+      console.error('Error clearing all data:', error);
+    }
+  };
 
   const updateProfile = (newProfile) => {
     setProfile(newProfile);
@@ -30,16 +62,14 @@ export const AuthProvider = ({ children }) => {
       // Verify session first
       const isSessionValid = await verifySession();
       if (!isSessionValid) {
-        setUser(null);
-        setProfile(null);
+        await clearAllData();
         return;
       }
       
       // Get current user
       const currentUser = await account.get();
       if (!currentUser) {
-        setUser(null);
-        setProfile(null);
+        await clearAllData();
         return;
       }
       
@@ -56,8 +86,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Error loading user data:', error);
       setError(error.message);
-      setUser(null);
-      setProfile(null);
+      await clearAllData();
     } finally {
       setLoading(false);
     }
@@ -76,25 +105,30 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
+      // Clear all data before login
+      await clearAllData();
+      
       // Login user
-      const loggedInUser = await loginUser(email, password);
-      if (!loggedInUser) {
-        throw new Error('Failed to login');
+      const session = await account.createEmailSession(email, password);
+      const accountData = await account.get();
+      
+      // Set user data
+      setUser(accountData);
+      
+      // Load fresh profile data
+      try {
+        const userProfile = await getUserProfile(accountData.$id);
+        setProfile(userProfile);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        setProfile(null);
       }
       
-      // Clear any existing state
-      setUser(null);
-      setProfile(null);
-      
-      // Load fresh user data
-      await loadUserData();
-      
-      return loggedInUser;
+      return session;
     } catch (error) {
       console.error('Login error:', error);
       setError(error.message);
-      setUser(null);
-      setProfile(null);
+      await clearAllData();
       throw error;
     } finally {
       setLoading(false);
@@ -104,20 +138,18 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setLoading(true);
-      // Try to delete current session first
-      try {
-        await account.deleteSession('current');
-      } catch (error) {
-        console.log('No current session to delete');
-      }
-      
-      // Clear all state regardless of session deletion result
-      setUser(null);
-      setProfile(null);
       setError(null);
+      
+      // Clear all data
+      await clearAllData();
+      
+      // Then logout from Appwrite
+      await logoutUser();
+      
     } catch (error) {
       console.error('Logout error:', error);
       setError(error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -131,7 +163,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateProfile,
-    loadUserData
+    loadUserData,
+    setNavigationRef
   };
 
   return (

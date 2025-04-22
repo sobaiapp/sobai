@@ -1,9 +1,8 @@
-name: iOS Release
+name: iOS Release to App Store
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'ios/**'
       - 'app.json'
@@ -15,164 +14,83 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # 1. Setup environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           
+      # 2. Install dependencies
       - name: Install dependencies
         run: |
-          npm install
+          npm ci
           cd ios
-          rm -rf Pods
-          rm -rf Podfile.lock
-          rm -rf ~/Library/Caches/CocoaPods
-          pod cache clean --all
-          pod deintegrate
-          pod setup
-          pod install --repo-update --verbose
+          pod install --repo-update
           cd ..
           
+      # 3. Fastlane setup (recommended for App Store uploads)
       - name: Install Fastlane
-        run: |
-          sudo gem install fastlane
+        run: sudo gem install fastlane
           
-      - name: Configure Fastlane
+      # 4. Configure Match (for code signing)
+      - name: Setup Match
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_TEAM_ID: Q834NS68MG
         run: |
           cd ios
           mkdir -p fastlane
+          cat > fastlane/Matchfile << EOF
+          git_url("${{ secrets.MATCH_REPO }}")
+          storage_mode("git")
+          type("appstore")
+          app_identifier(["com.sobai.app"])
+          username("${{ secrets.APPLE_ID }}")
+          team_id("Q834NS68MG")
+          EOF
+          
           cat > fastlane/Fastfile << EOF
           default_platform(:ios)
           
           platform :ios do
-            desc "Build and upload to App Store"
             lane :release do
-              begin
-                # Print current directory and list files
-                sh("pwd")
-                sh("ls -la")
-                
-                # Print Xcode version
-                sh("xcodebuild -version")
-                
-                # Print code signing settings
-                sh("security find-identity -v -p codesigning")
-                
-                update_code_signing_settings(
-                  use_automatic_signing: false,
-                  team_id: "Q834NS68MG",
-                  targets: ["SobAi"],
-                  profile_name: "SB_AI_App_Store",
-                  code_sign_identity: "iPhone Distribution"
-                )
-                
-                # Print updated project settings
-                sh("xcodebuild -showBuildSettings -workspace SobAi.xcworkspace -scheme SobAi")
-                
-                # Clean the build directory
-                sh("rm -rf ~/Library/Developer/Xcode/DerivedData/*")
-                
-                build_ios_app(
-                  workspace: "SobAi.xcworkspace",
-                  scheme: "SobAi",
-                  export_method: "app-store",
-                  export_options: {
-                    method: "app-store",
-                    teamID: "Q834NS68MG",
-                    signingStyle: "manual",
-                    provisioningProfileName: "SB_AI_App_Store",
-                    signingCertificate: "iPhone Distribution"
-                  },
-                  clean: true,
-                  output_directory: "./",
-                  output_name: "SobAi.ipa",
-                  configuration: "Release",
-                  xcargs: {
-                    PROVISIONING_PROFILE_SPECIFIER: "SB_AI_App_Store",
-                    CODE_SIGN_IDENTITY: "iPhone Distribution"
-                  }
-                )
-                
-                # Verify IPA was created
-                if File.exist?("./SobAi.ipa")
-                  UI.success("IPA file created successfully")
-                  sh("ls -la ./SobAi.ipa")
-                else
-                  UI.error("IPA file was not created")
-                  # List all files in the directory
-                  sh("ls -la ./")
-                  # Check DerivedData directory
-                  sh("ls -la ~/Library/Developer/Xcode/DerivedData/")
-                end
-              rescue => e
-                UI.error("Build failed with error: #{e.message}")
-                UI.error("Backtrace: #{e.backtrace.join("\n")}")
-                # List all files in case of failure
-                sh("ls -la ./")
-                raise e
-              end
+              match(type: "appstore")
+              
+              build_app(
+                workspace: "SobAi.xcworkspace",
+                scheme: "SobAi",
+                clean: true,
+                export_method: "app-store",
+                output_directory: "build",
+                configuration: "Release"
+              )
+              
+              upload_to_app_store(
+                api_key_path: "fastlane/AppStore_ApiKey.json",
+                skip_metadata: true,
+                skip_screenshots: true
+              )
             end
           end
           EOF
           
-          cat > fastlane/Appfile << EOF
-          app_identifier("com.sobai.app")
-          apple_id("${{ secrets.APPLE_ID }}")
-          team_id("Q834NS68MG")
-          EOF
+          # For App Store Connect API (recommended)
+          echo '${{ secrets.APP_STORE_CONNECT_API_KEY }}' > fastlane/AppStore_ApiKey.json
           cd ..
           
-      - name: Build iOS app with Fastlane
+      # 5. Execute Fastlane
+      - name: Run Fastlane Release
         env:
-          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
-          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          FASTLANE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
           cd ios
-          # Save the output to a log file
-          fastlane release 2>&1 | tee fastlane.log
-          # Check if build was successful
-          if [ $? -eq 0 ]; then
-            echo "Build successful"
-          else
-            echo "Build failed"
-          fi
+          fastlane release
           cd ..
           
-      - name: Upload Build Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build-logs
-          path: ios/fastlane.log
-          if-no-files-found: error
-          
-      - name: Check for IPA file
-        id: check-ipa
-        run: |
-          if [ -f "ios/SobAi.ipa" ]; then
-            echo "ipa_exists=true" >> $GITHUB_OUTPUT
-            echo "Found IPA file at ios/SobAi.ipa"
-            ls -la ios/
-          else
-            echo "ipa_exists=false" >> $GITHUB_OUTPUT
-            echo "No IPA file found in ios directory"
-            ls -la ios/
-          fi
-          
+      # 6. Upload artifacts (optional)
       - name: Upload IPA
-        if: steps.check-ipa.outputs.ipa_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build-artifacts
-          path: ios/SobAi.ipa
-          if-no-files-found: warn
-          
-      - name: Create GitHub Release
-        if: steps.check-ipa.outputs.ipa_exists == 'true'
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ios/SobAi.ipa
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          name: SobAi-IPA
+          path: ios/build/SobAi.ipa
