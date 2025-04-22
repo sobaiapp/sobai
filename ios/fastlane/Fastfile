@@ -5,21 +5,56 @@ platform :ios do
   lane :beta do
     setup_ci
     
+    # Create temporary keychain
+    create_keychain(
+      name: "fastlane_tmp_keychain",
+      password: "password",
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+    
+    # Import certificates
+    match(
+      type: "appstore",
+      readonly: true,
+      keychain_name: "fastlane_tmp_keychain",
+      keychain_password: "password"
+    )
+    
     # Update code signing settings
     update_code_signing_settings(
-      use_automatic_signing: true,
-      team_id: ENV["APPLE_TEAM_ID"]
+      use_automatic_signing: false,
+      team_id: ENV["APPLE_TEAM_ID"],
+      targets: ["SobAi"],
+      build_configurations: ["Release"],
+      code_sign_identity: "iPhone Distribution",
+      profile_name: "SB_AI_App_Store",
+      profile_uuid: ENV["PROVISIONING_PROFILE_UUID"]
     )
     
     # Build the app
     build_ios_app(
       workspace: "SobAi.xcworkspace",
       scheme: "SobAi",
+      configuration: "Release",
+      clean: true,
+      output_directory: "build",
+      output_name: "SobAi.ipa",
       export_method: "app-store",
       export_options: {
+        method: "app-store",
         provisioningProfiles: { 
           "com.sobai.app" => "SB_AI_App_Store"
-        }
+        },
+        signingStyle: "manual",
+        teamID: ENV["APPLE_TEAM_ID"]
+      },
+      xcargs: {
+        DEVELOPMENT_TEAM: ENV["APPLE_TEAM_ID"],
+        PROVISIONING_PROFILE_SPECIFIER: "SB_AI_App_Store",
+        CODE_SIGN_IDENTITY: "iPhone Distribution"
       }
     )
     
@@ -27,5 +62,8 @@ platform :ios do
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )
+    
+    # Clean up keychain
+    delete_keychain(name: "fastlane_tmp_keychain")
   end
 end 
