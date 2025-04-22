@@ -1,4 +1,4 @@
-name: iOS Build
+name: iOS Build and Deploy
 
 on:
   workflow_dispatch:  # Allows manual triggering
@@ -10,13 +10,16 @@ on:
       - 'src/**'
       - 'app.json'
       - 'package.json'
+      - '.github/workflows/**'
 
 jobs:
   build:
+    name: Build iOS App
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
     
     - name: Set up Node.js
       uses: actions/setup-node@v4
