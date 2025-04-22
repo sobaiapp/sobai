@@ -17,10 +17,7 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: true,
       team_id: "Q834NS68MG",
-      path: "SobAi.xcodeproj",
-      targets: ["SobAi"],
-      build_configurations: ["Debug", "Release"],
-      profile_name: "Automatic"
+      path: "SobAi.xcodeproj"
     )
 
     # Build the app with automatic signing
@@ -28,10 +25,11 @@ platform :ios do
       scheme: "SobAi",
       export_method: "app-store",
       export_options: {
-        signingStyle: "automatic",
-        provisioningProfiles: {
-          "com.sobai.app" => "Automatic"
-        }
+        signingStyle: "automatic"
+      },
+      xcargs: {
+        PROVISIONING_PROFILE_SPECIFIER: "",
+        CODE_SIGN_STYLE: "Automatic"
       }
     )
 
