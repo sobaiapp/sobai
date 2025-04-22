@@ -20,7 +20,8 @@ platform :ios do
       path: "SobAi.xcodeproj",
       targets: ["SobAi"],
       build_configurations: ["Debug", "Release"],
-      code_sign_identity: "Apple Development"
+      code_sign_identity: "Apple Development",
+      profile_name: "Automatic"
     )
 
     # Build the app with automatic signing
