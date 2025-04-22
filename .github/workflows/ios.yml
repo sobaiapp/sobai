@@ -36,6 +36,11 @@ jobs:
       run: |
         sudo gem install fastlane -NV
     
+    - name: Install Provisioning Profile
+      run: |
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp .github/provisioning-profiles/SB_AI_App_Store.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+    
     - name: Run Fastlane
       env:
         APPLE_TEAM_ID: Q834NS68MG
