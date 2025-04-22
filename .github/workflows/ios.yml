@@ -16,12 +16,13 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
     
     - name: Install dependencies
       run: |
@@ -30,7 +31,7 @@ jobs:
     
     - name: Install Fastlane
       run: |
-        sudo gem install fastlane
+        sudo gem install fastlane -NV
     
     - name: Run Fastlane
       env:
@@ -40,7 +41,7 @@ jobs:
         fastlane beta
     
     - name: Upload IPA
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SobAi.ipa
         path: ios/build/SobAi.ipa 
