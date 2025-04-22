@@ -12,19 +12,23 @@ platform :ios do
       timeout: 3600
     )
 
-    # Update code signing settings to use automatic signing
+    # Update code signing settings to use manual signing
     update_code_signing_settings(
-      use_automatic_signing: true,
-      team_id: "Q834NS68MG"
+      use_automatic_signing: false,
+      team_id: "Q834NS68MG",
+      profile_name: "SB_AI_App_Store",
+      code_sign_identity: "iPhone Distribution"
     )
 
-    # Build the app with automatic signing
+    # Build the app with manual signing
     build_ios_app(
       scheme: "SobAi",
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        signingStyle: "automatic"
+        provisioningProfiles: {
+          "com.sobai.app" => "SB_AI_App_Store"
+        }
       },
       output_directory: "./build",
       output_name: "SobAi.ipa"
