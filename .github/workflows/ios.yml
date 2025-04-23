@@ -20,6 +20,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -47,7 +49,7 @@ jobs:
         FASTLANE_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        MATCH_GIT_URL: https://github.com/sobaiapp/ios-certificates.git
+        MATCH_GIT_URL: https://${{ secrets.GITHUB_TOKEN }}@github.com/sobaiapp/ios-certificates.git
       run: |
         cd ios
         bundle exec fastlane beta
