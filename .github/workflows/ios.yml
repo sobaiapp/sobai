@@ -41,20 +41,12 @@ jobs:
         pod install
         cd ..
 
-    - name: Configure match for signing
-      env:
-        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        FASTLANE_USER: ${{ secrets.APPLE_ID }}
-        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-        MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-      run: |
-        cd ios
-        bundle exec fastlane match appstore --readonly
-
     - name: Build and upload to TestFlight
       env:
         FASTLANE_USER: ${{ secrets.APPLE_ID }}
-        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        FASTLANE_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
         cd ios
         bundle exec fastlane beta
