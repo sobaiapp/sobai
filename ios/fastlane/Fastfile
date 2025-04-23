@@ -1,12 +1,12 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Build iOS app for App Store using manual code signing"
+  desc "Build iOS app for TestFlight using match"
   lane :beta do
+    # Create temporary keychain
     keychain_name = "temp_keychain"
     keychain_password = "temp_password"
-
-    # Create temporary keychain
+    
     create_keychain(
       name: keychain_name,
       password: keychain_password,
@@ -16,35 +16,19 @@ platform :ios do
       add_to_search_list: true
     )
 
-    # Read provisioning profile UUID
-    profile_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/SB_AI.mobileprovision")
-    profile_uuid = sh("security cms -D -i '#{profile_path}' | /usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin").strip
-
-    # Update code signing settings manually
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      team_id: ENV["FASTLANE_TEAM_ID"],
-      path: "./SobAi.xcodeproj",
-      targets: ["SobAi"],
-      build_configurations: ["Release"],
-      code_sign_identity: "iPhone Distribution",
-      profile_name: "SB_AI",
-      profile_uuid: profile_uuid
+    # Get certificates and provisioning profiles using match
+    match(
+      type: "appstore",
+      readonly: true,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password
     )
 
-    # Build with manual code signing
+    # Build the app
     build_ios_app(
       workspace: "SobAi.xcworkspace",
       scheme: "SobAi",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "com.sobai.app" => "SB_AI"
-        },
-        signingStyle: "manual",
-        teamID: ENV["FASTLANE_TEAM_ID"]
-      },
-      xcargs: "PROVISIONING_PROFILE_SPECIFIER=SB_AI CODE_SIGN_IDENTITY='iPhone Distribution' DEVELOPMENT_TEAM=#{ENV['FASTLANE_TEAM_ID']}"
+      export_method: "app-store"
     )
 
     # Upload to TestFlight
@@ -52,7 +36,7 @@ platform :ios do
       skip_waiting_for_build_processing: true
     )
 
-    # Delete the temporary keychain
+    # Clean up
     delete_keychain(name: keychain_name)
   end
 end
