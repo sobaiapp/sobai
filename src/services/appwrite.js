@@ -325,12 +325,19 @@ export const getUserProfile = async (userId) => {
   try {
     console.log('Getting profile for user:', userId);
     
+    if (!userId) {
+      console.error('No userId provided to getUserProfile');
+      throw new Error('User ID is required');
+    }
+
     // Try to get the profile by userId
     const response = await databases.listDocuments(
       DATABASE_ID,
       PROFILES_COLLECTION_ID,
       [Query.equal('userId', userId)]
     );
+
+    console.log('Profile query response:', response);
 
     if (response.documents.length > 0) {
       console.log('Found profile:', response.documents[0]);
@@ -345,7 +352,10 @@ export const getUserProfile = async (userId) => {
       message: error.message,
       code: error.code,
       type: error.type,
-      response: error.response
+      response: error.response,
+      userId: userId,
+      databaseId: DATABASE_ID,
+      collectionId: PROFILES_COLLECTION_ID
     });
     throw formatAppwriteError(error);
   }

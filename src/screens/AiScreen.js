@@ -12,13 +12,15 @@ import {
   Animated,
   Easing,
   ImageBackground,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { OPENAI_API_KEY } from '@env';
 
 const { width } = Dimensions.get('window');
 
@@ -42,14 +44,37 @@ const AiScreen = () => {
   useEffect(() => {
     const loadApiKey = async () => {
       try {
-        const key = await AsyncStorage.getItem('@openai_api_key');
-        if (key) {
-          setApiKey(key);
+        console.log('Loading API key...');
+        // First try to get from AsyncStorage
+        const storedKey = await AsyncStorage.getItem('@openai_api_key');
+        if (storedKey) {
+          console.log('Found API key in storage');
+          setApiKey(storedKey);
+          return;
+        }
+        
+        // If no stored key, use environment variable
+        console.log('No stored key, using environment variable');
+        if (OPENAI_API_KEY) {
+          console.log('Environment variable found');
+          setApiKey(OPENAI_API_KEY);
+          // Store it for future use
+          await AsyncStorage.setItem('@openai_api_key', OPENAI_API_KEY);
         } else {
-          setApiKey(process.env.OPENAI_API_KEY); // Use environment variable
+          console.error('No OpenAI API key found in environment');
+          Alert.alert(
+            'API Key Missing',
+            'Please set up your OpenAI API key in the .env file',
+            [{ text: 'OK' }]
+          );
         }
       } catch (error) {
         console.error('Error loading API key:', error);
+        Alert.alert(
+          'Error',
+          'Failed to load API key. Please check your configuration.',
+          [{ text: 'OK' }]
+        );
       }
     };
     loadApiKey();
@@ -76,10 +101,12 @@ const AiScreen = () => {
   // Get AI response from OpenAI API
   const getAiResponse = async (userInput) => {
     if (!apiKey) {
+      console.error('No API key available');
       return "Please set your OpenAI API key in settings to enable full AI capabilities.";
     }
 
     try {
+      console.log('Sending request to OpenAI API...');
       setIsTyping(true);
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
@@ -106,9 +133,10 @@ const AiScreen = () => {
         }
       );
       
+      console.log('Received response from OpenAI API');
       return response.data.choices[0].message.content.trim();
     } catch (error) {
-      console.error('AI API error:', error);
+      console.error('AI API error:', error.response?.data || error.message);
       const fallbackResponses = [
         "I'm having trouble connecting right now. Remember: One day at a time. 💪",
         "Connection issue - but you're stronger than any challenge!",

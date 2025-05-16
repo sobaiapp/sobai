@@ -95,3 +95,9 @@ credentials.json
 
 # Bundle artifact
 *.jsbundle
+
+# Environment variables
+.env.local
+.env.development
+.env.test
+.env.production

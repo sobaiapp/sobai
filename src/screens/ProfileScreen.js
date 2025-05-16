@@ -40,7 +40,8 @@ import {
   STATS_COLLECTION_ID,
   ACHIEVEMENTS_COLLECTION_ID,
   POSTS_COLLECTION_ID,
-  verifySession
+  verifySession,
+  account
 } from '../services/appwrite';
 import { useAuth } from '../context/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -71,15 +72,29 @@ const ProfileScreen = ({ navigation, route }) => {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        console.log('Checking session...');
+        // Test Appwrite connection first
+        try {
+          const currentUser = await account.get();
+          console.log('Current user:', currentUser);
+        } catch (error) {
+          console.error('Appwrite connection error:', error);
+          setError('Failed to connect to Appwrite. Please check your internet connection.');
+          return;
+        }
+
         const isSessionValid = await verifySession();
+        console.log('Session valid:', isSessionValid);
         if (!isSessionValid) {
+          console.log('Session invalid, redirecting to Start screen');
           navigation.reset({
             index: 0,
             routes: [{ name: 'Start' }]
           });
-        return;
-          }
+          return;
+        }
         if (user) {
+          console.log('User found, loading profile data...');
           // Reset all state when user changes
           setLocalProfile(null);
           setFriends([]);
@@ -89,8 +104,10 @@ const ProfileScreen = ({ navigation, route }) => {
           setStats(null);
           setAchievements([]);
           loadProfileData();
+        } else {
+          console.log('No user found in state');
         }
-            } catch (error) {
+      } catch (error) {
         console.error('Session verification error:', error);
         navigation.reset({
           index: 0,
@@ -110,6 +127,8 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const loadProfileData = async () => {
     if (!user) {
+      console.log('No user found');
+      setError('No user found. Please log in again.');
       setLoading(false);
       return;
     }
@@ -117,7 +136,14 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
+      // Log IDs and user
+      console.log('Loading profile data with:');
+      console.log('- DATABASE_ID:', DATABASE_ID);
+      console.log('- PROFILES_COLLECTION_ID:', PROFILES_COLLECTION_ID);
+      console.log('- User ID:', user.$id);
+      console.log('- User object:', user);
+
       // Reset all state when loading new profile
       setLocalProfile(null);
       setFriends([]);
@@ -126,74 +152,129 @@ const ProfileScreen = ({ navigation, route }) => {
       setPosts([]);
       setStats(null);
       setAchievements([]);
-      
-      console.log('Loading profile data for user:', user.$id);
-      
-      // Load user's profile from the profiles collection
-        const profileResponse = await databases.listDocuments(
+
+      console.log('Fetching profile from database...');
+      let profileResponse;
+      try {
+        profileResponse = await databases.listDocuments(
           DATABASE_ID,
           PROFILES_COLLECTION_ID,
-        [Query.equal('userId', user.$id)]
-      );
+          [Query.equal('userId', user.$id)]
+        );
+        console.log('Profile response:', profileResponse);
+      } catch (fetchError) {
+        console.error('Error fetching profile:', fetchError);
+        console.error('Error details:', {
+          message: fetchError.message,
+          code: fetchError.code,
+          type: fetchError.type,
+          response: fetchError.response
+        });
+        setError('Failed to fetch profile. Please check your network or permissions.');
+        setLoading(false);
+        return;
+      }
 
       let profile = profileResponse.documents[0];
-      
+      console.log('Found profile:', profile);
+
       if (!profile) {
-        console.log('No profile found, creating new one...');
-        // Create a new profile if one doesn't exist
-        profile = await databases.createDocument(
+        try {
+          console.log('No profile found, creating new one...');
+          // Create a new profile if one doesn't exist
+          profile = await databases.createDocument(
             DATABASE_ID,
             PROFILES_COLLECTION_ID,
-          'unique()',
-          {
-            userId: user.$id,
-            name: user.name,
-            email: user.email,
-            createdAt: new Date().toISOString()
-          }
-        );
+            'unique()',
+            {
+              userId: user.$id,
+              name: user.name,
+              email: user.email,
+              createdAt: new Date().toISOString()
+            }
+          );
+          console.log('Created new profile:', profile);
+        } catch (createError) {
+          console.error('Error creating profile:', createError);
+          console.error('Error details:', {
+            message: createError.message,
+            code: createError.code,
+            type: createError.type,
+            response: createError.response
+          });
+          setError('Failed to create profile. Please check your permissions.');
+          setLoading(false);
+          return;
+        }
       }
 
       setLocalProfile(profile);
       updateProfile(profile);
+      console.log('Profile set in state');
 
       // Load other data in parallel
-      const [
-        friendRequestsData,
-        friendsData,
-        messagesData,
-        statsData,
-        achievementsData,
-        postsData
-      ] = await Promise.all([
-        getFriendRequests(user.$id),
-        databases.listDocuments(DATABASE_ID, PROFILES_COLLECTION_ID, [
-          Query.equal('friends', user.$id)
-        ]),
-        getMessages(user.$id),
-        databases.listDocuments(DATABASE_ID, STATS_COLLECTION_ID, [
-          Query.equal('userId', user.$id)
-        ]),
-        databases.listDocuments(DATABASE_ID, ACHIEVEMENTS_COLLECTION_ID, [
-          Query.equal('userId', user.$id)
-        ]),
-        databases.listDocuments(DATABASE_ID, POSTS_COLLECTION_ID, [
-          Query.equal('userId', user.$id)
-        ])
-      ]);
+      console.log('Loading additional profile data...');
+      try {
+        const [
+          friendRequestsData,
+          friendsData,
+          messagesData,
+          statsData,
+          achievementsData,
+          postsData
+        ] = await Promise.all([
+          getFriendRequests(user.$id),
+          databases.listDocuments(DATABASE_ID, PROFILES_COLLECTION_ID, [
+            Query.equal('friends', user.$id)
+          ]),
+          getMessages(user.$id),
+          databases.listDocuments(DATABASE_ID, STATS_COLLECTION_ID, [
+            Query.equal('userId', user.$id)
+          ]),
+          databases.listDocuments(DATABASE_ID, ACHIEVEMENTS_COLLECTION_ID, [
+            Query.equal('userId', user.$id)
+          ]),
+          databases.listDocuments(DATABASE_ID, POSTS_COLLECTION_ID, [
+            Query.equal('userId', user.$id)
+          ])
+        ]);
 
-      setFriendRequests(friendRequestsData);
-      setFriends(friendsData.documents);
-      setMessages(messagesData);
-      setStats(statsData.documents[0] || null);
-      setAchievements(achievementsData.documents);
-      setPosts(postsData.documents);
+        console.log('Additional data loaded:');
+        console.log('- Friend requests:', friendRequestsData);
+        console.log('- Friends:', friendsData.documents);
+        console.log('- Messages:', messagesData);
+        console.log('- Stats:', statsData.documents[0]);
+        console.log('- Achievements:', achievementsData.documents);
+        console.log('- Posts:', postsData.documents);
 
-      } catch (error) {
+        setFriendRequests(friendRequestsData);
+        setFriends(friendsData.documents);
+        setMessages(messagesData);
+        setStats(statsData.documents[0] || null);
+        setAchievements(achievementsData.documents);
+        setPosts(postsData.documents);
+      } catch (otherDataError) {
+        console.error('Error loading additional profile data:', otherDataError);
+        console.error('Error details:', {
+          message: otherDataError.message,
+          code: otherDataError.code,
+          type: otherDataError.type,
+          response: otherDataError.response
+        });
+        setError('Failed to load additional profile data. Some features may not work.');
+      }
+    } catch (error) {
       console.error('Error loading profile data:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        type: error.type,
+        response: error.response
+      });
       setError('Failed to load profile data. Please try again.');
     } finally {
       setLoading(false);
+      console.log('Profile loading complete');
     }
   };
 

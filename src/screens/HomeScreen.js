@@ -248,8 +248,7 @@ const HomeScreen = ({ navigation }) => {
               >
                 {(fill) => (
                   <View style={styles.healthProgressTextContainer}>
-                    <Text style={styles.healthProgressText}>{totalCheckIns}</Text>
-                    <Text style={styles.healthProgressLabel}>Current Streak</Text>
+                    <Icon name="calendar-check" size={32} color="#4CAF50" />
                   </View>
                 )}
               </CircularProgress>
@@ -274,21 +273,10 @@ const HomeScreen = ({ navigation }) => {
               >
                 {(fill) => (
                   <View style={styles.healthProgressTextContainer}>
-                    <Text style={styles.healthProgressText}>{Math.round(fill)}%</Text>
-                    <Text style={styles.healthProgressLabel}>Overall</Text>
+                    <Icon name="heart-pulse" size={32} color="#FF6B6B" />
                   </View>
                 )}
               </CircularProgress>
-            </View>
-            <View style={styles.healthStatsContainer}>
-              <View style={styles.healthStat}>
-                <Text style={styles.healthStatLabel}>Sleep</Text>
-                <Text style={styles.healthStatValue}>15%</Text>
-              </View>
-              <View style={styles.healthStat}>
-                <Text style={styles.healthStatLabel}>Energy</Text>
-                <Text style={styles.healthStatValue}>20%</Text>
-              </View>
             </View>
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Health')}>
       <Text style={styles.buttonText}>Track Health</Text>
@@ -544,16 +532,20 @@ const styles = StyleSheet.create({
   },
   healthProgressTextContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressIcon: {
+    marginBottom: 4,
   },
   healthProgressText: {
-    fontSize: 32,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 5,
   },
   healthProgressLabel: {
-    fontSize: 20,
-    color: '#555',
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
   healthStatsContainer: {
     flexDirection: 'row',
